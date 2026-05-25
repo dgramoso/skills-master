@@ -1,2 +1,1 @@
-# skills-master
-Repositorio maestro de IA-Skills
+# Repositorio maestro de IA-Skills
