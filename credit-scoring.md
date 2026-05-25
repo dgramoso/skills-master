@@ -1,11 +1,11 @@
 ﻿---
 name: credit-scoring
-description: Skill para desarrollar, auditar, refactorizar o documentar proyectos de credit scoring en R con metodologia tipo Naeem Siddiqi. Usar cuando Codex trabaje con ingesta y definicion de target, integracion de datos, limpieza, feature engineering, WOE/IV, regresion logistica con lrm, validacion OOT, PSI, KS, strategy tables, monitoreo, modelos .rds e informes HTML finales para cliente.
+description: Skill para desarrollar, auditar, refactorizar o documentar proyectos de credit scoring con metodologia tipo Naeem Siddiqi. Usar cuando se trabaje con ingesta y definicion de target, integracion de datos, limpieza, feature engineering, WOE/IV, regresion logistica con lrm, validacion OOT, PSI, KS, strategy tables, monitoreo, modelos e informes HTML finales para cliente.
 ---
 
 # Credit Scoring R Siddiqi
 
-Usar esta skill para proyectos de credit scoring en R, desde datos crudos hasta un informe HTML final para cliente. Priorizar trazabilidad, validacion, interpretabilidad regulatoria y un pipeline reproducible.
+Usar esta skill para proyectos de credit scoring, desde datos crudos hasta un informe HTML final para cliente. Priorizar trazabilidad, validacion, interpretabilidad regulatoria y un pipeline reproducible.
 
 ## Principios
 
@@ -15,6 +15,7 @@ Usar esta skill para proyectos de credit scoring en R, desde datos crudos hasta 
 - Evitar leakage entre variables explicativas y target.
 - Preferir modelos logisticos interpretables con WOE/IV, monotonicidad razonable, estabilidad y sentido de negocio.
 - Tratar cada output como auditable: incluir conteos, tasas, fechas, criterios y checks.
+- Recomendar mejoras en el proceso toda vez que se detecte alguna oportunidad.
 
 ## Estructura Esperada
 
@@ -26,13 +27,9 @@ credit_scoring_R/
 |   |-- 00_config.R
 |   |-- 00_run_pipeline.R
 |   |-- 01_ingesta_y_target.R
-|   |-- 01_ingesta_y_target_validacion.R
 |   |-- 02_bcu_integracion_datos.R
-|   |-- 02_bcu_integracion_datos_validacion.R
 |   |-- 03_limpieza_y_features.R
-|   |-- 03_limpieza_y_features_validacion.R
 |   |-- 04_modelizacion.R
-|   |-- 04_modelizacion_validacion.R
 |   |-- 05_informe_cliente.R
 |   `-- mis_funciones.r
 |-- datos/
@@ -60,9 +57,6 @@ En `01_ingesta_y_target.R`:
 - Cargar fuentes base y conservar una tabla de auditoria de filas, claves, fechas y duplicados.
 - Definir claramente el target: evento malo, ventana de observacion, ventana de performance, exclusiones e indeterminados.
 - Crear variables como `target`, `bad`, `good`, `indeterminate`, `sample_flag`, `periodo_obs` y `periodo_perf` cuando apliquen.
-
-En `01_ingesta_y_target_validacion.R`:
-
 - Validar conteos por poblacion, distribucion good/bad/indeterminado, tasa de malos, duplicados y consistencia temporal.
 
 ### 3. Integracion De Datos
@@ -72,9 +66,6 @@ En `02_bcu_integracion_datos.R`:
 - Integrar datos externos o BCU por claves y fechas correctas.
 - Evitar usar informacion posterior a la fecha de observacion.
 - Mantener trazabilidad de joins, cobertura, registros no matcheados y variables agregadas.
-
-En `02_bcu_integracion_datos_validacion.R`:
-
 - Validar cobertura por fuente, tasas de match, missingness inducida, duplicacion post-join y consistencia de fechas.
 
 ### 4. Limpieza Y Feature Engineering
@@ -84,9 +75,6 @@ En `03_limpieza_y_features.R`:
 - Estandarizar tipos, unidades, categorias, outliers y valores especiales.
 - Crear features con sentido crediticio: antiguedad, mora historica, utilizacion, endeudamiento, capacidad de pago, consultas, comportamiento reciente, saldos, ratios y tendencias.
 - Separar variables candidatas, variables excluidas y motivos de exclusion.
-
-En `03_limpieza_y_features_validacion.R`:
-
 - Revisar missingness, rangos, cardinalidad, outliers, distribuciones, estabilidad por periodo y relacion preliminar con target.
 
 ### 5. WOE, IV Y Binning
@@ -111,16 +99,14 @@ Reportar como minimo:
 - AUC/Gini, KS, matriz de confusion o performance por umbral si aplica.
 - Lift o deciles de score.
 - Coeficientes, odds ratios o interpretacion de drivers.
-- Comparacion train/validation/OOT.
+- Validar discriminacion con KS, AUC/Gini y deciles.
+- Calcular PSI de score y variables relevantes entre desarrollo, validacion, OOT y periodos recientes.
 
 ### 7. Validacion, PSI Y Monitoreo
 
-En `04_modelizacion_validacion.R`:
-
-- Validar discriminacion con KS, AUC/Gini y deciles.
-- Calcular PSI de score y variables relevantes entre desarrollo, validacion, OOT y periodos recientes.
 - Revisar calibracion, bad rate por banda, estabilidad de bins y drift de poblacion.
 - Preparar strategy tables con bandas de score, tasas de aprobacion, bad rate, odds, volumen, acumulados y tradeoffs.
+- Comparacion train/validation/OOT.
 
 ### 8. Informe Cliente
 
@@ -164,5 +150,5 @@ Al finalizar, producir o dejar preparado:
 
 - Responder en espanol si el usuario trabaja en espanol.
 - Ser concreto, tecnico y orientado a negocio.
-- Cuando edites codigo R, conservar nombres y convenciones existentes.
+- Cuando edites codigo, conservar nombres y convenciones existentes.
 - Explicar riesgos crediticios o metodologicos con claridad: leakage, mala definicion de target, baja estabilidad, sobreajuste, variables no operables o reglas dificiles de justificar.
