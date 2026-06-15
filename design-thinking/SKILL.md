@@ -1,4 +1,4 @@
-﻿---
+---
 name: design-thinking
 description: >
   Framework de pensamiento estructurado para resolver problemas complejos desde cero.

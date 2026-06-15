@@ -1,4 +1,4 @@
-﻿---
+---
 name: premortem  
 description: "Ejecuta un premortem sobre cualquier plan, lanzamiento, producto, contratación, estrategia o decisión. Asume que ya falló 6 meses después y trabaja hacia atrás para encontrar todos los motivos. Produce un plan revisado con los puntos ciegos expuestos. DISPARADORES OBLIGATORIOS: 'premortem esto', 'premortem mi', 'ejecuta un premortem', 'qué podría matar esto', 'prueba de estrés este plan', 'qué me estoy perdiendo aquí', 'encuentra los puntos ciegos'. DISPARADORES FUERTES: 'qué podría salir mal', 'me estoy perdiendo algo', 'hazle agujeros a esto', 'dónde va a romperse esto', 'abogado del diablo'. NO disparar en solicitudes simples de retroalimentación, preguntas factuales o solicitudes al Consejo LLM. SÍ disparar cuando alguien tiene un plan o compromiso donde el coste de equivocarse es alto."  
 ---

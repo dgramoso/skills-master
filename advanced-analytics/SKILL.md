@@ -1,4 +1,4 @@
-﻿---
+---
 name: advanced-analytics
 description: End-to-end workflow for structured data analytics projects from raw CSV, SQL, or Excel data to cleaned datasets, exploratory analysis, statistical or machine learning models, driver analysis, charts, reports, and executive-ready business insights. Use when Codex needs to analyze datasets, perform EDA, build segmentation, scoring, regression, classification, clustering, forecasting, or translate findings into recommendations.
 ---

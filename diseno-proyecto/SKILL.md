@@ -1,4 +1,4 @@
-﻿---
+---
 name: diseno-proyecto
 description: >
   Implementa la metodología Spec-Driven Development (SDD) para diseñar proyectos de software.

@@ -1,4 +1,4 @@
-﻿---
+---
 name: technical-exploded-view-infographic
 description: Generate a precise engineering-style image prompt for a square exploded-view technical infographic of any mechanical, electronic, architectural, or engineering object. Use when the user wants to create, refine, or standardize an image prompt where the only editable variable is an object name.
 ---

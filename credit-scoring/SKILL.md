@@ -1,154 +1,613 @@
-﻿---
+---
 name: credit-scoring
-description: Skill para desarrollar, auditar, refactorizar o documentar proyectos de credit scoring con metodologia tipo Naeem Siddiqi. Usar cuando se trabaje con ingesta y definicion de target, integracion de datos, limpieza, feature engineering, WOE/IV, regresion logistica con lrm, validacion OOT, PSI, KS, strategy tables, monitoreo, modelos e informes HTML finales para cliente.
+description: Skill para desarrollar, auditar, refactorizar, validar, monitorear o documentar proyectos de credit scoring con metodología tipo Naeem Siddiqi. Utilizar cuando se trabaje con definición de target, integración de datos, feature engineering, WOE/IV, scorecards, regresión logística, validación OOT, PSI, monitoreo, strategy tables, governance, modelos .rds e informes ejecutivos para negocio o riesgo.
 ---
 
 # Credit Scoring R Siddiqi
 
-Usar esta skill para proyectos de credit scoring, desde datos crudos hasta un informe HTML final para cliente. Priorizar trazabilidad, validacion, interpretabilidad regulatoria y un pipeline reproducible.
+Utilizar esta skill para proyectos de credit scoring de punta a punta, desde la ingesta de datos crudos hasta la construcción de scorecards, validación, monitoreo e informes finales para cliente o áreas de riesgo.
 
-## Principios
+Priorizar:
 
-- Mantener el flujo modular por scripts numerados y validaciones espejo.
-- Separar datos crudos, datos procesados, outputs tecnicos, graficos, modelos, reportes e informe final.
-- Documentar decisiones de negocio: definicion de default, ventana de performance, exclusiones, poblacion elegible, fecha de observacion y fecha de maduracion.
-- Evitar leakage entre variables explicativas y target.
-- Preferir modelos logisticos interpretables con WOE/IV, monotonicidad razonable, estabilidad y sentido de negocio.
-- Tratar cada output como auditable: incluir conteos, tasas, fechas, criterios y checks.
-- Recomendar mejoras en el proceso toda vez que se detecte alguna oportunidad.
+* Interpretabilidad.
+* Trazabilidad.
+* Reproducibilidad.
+* Robustez estadística.
+* Justificación de negocio.
+* Cumplimiento regulatorio.
+* Mantenibilidad en producción.
 
-## Estructura Esperada
+---
 
-Trabajar con esta estructura cuando el proyecto no tenga una convencion mejor:
+# Principios
+
+* Mantener un pipeline modular y reproducible.
+* Evitar leakage en todas las etapas.
+* Preservar trazabilidad de cada transformación.
+* Documentar todas las decisiones metodológicas.
+* Favorecer modelos interpretables salvo indicación explícita.
+* Todo output debe ser auditable: incluir conteos, tasas, fechas, criterios y checks.
+* Ninguna métrica debe presentarse sin contexto de negocio.
+* Todo modelo debe ser explicable para auditoría, validación independiente y áreas comerciales.
+* Preservar convenciones existentes del proyecto. No cambiar librerías, estructuras o nomenclaturas sin necesidad.
+
+---
+
+# Estructura Recomendada
 
 ```text
-credit_scoring_R/
+credit_scoring/
+|
 |-- scripts/
 |   |-- 00_config.R
 |   |-- 00_run_pipeline.R
 |   |-- 01_ingesta_y_target.R
-|   |-- 02_bcu_integracion_datos.R
+|   |-- 02_integracion_datos.R
 |   |-- 03_limpieza_y_features.R
 |   |-- 04_modelizacion.R
-|   |-- 05_informe_cliente.R
-|   `-- mis_funciones.r
+|   |-- 05_validacion_y_monitoreo.R
+|   |-- 06_informe.R
+|   `-- mis_funciones.R
+|
 |-- datos/
-|-- eda/
+|   |-- raw/
+|   |-- processed/
+|
+|-- EDA/
+|
 |-- modelos/
+|
 |-- reportes/
+|
 |-- graficos/
-`-- informe/
+|
+|-- informe/
+|
+|-- governance/
+|
+`-- logs/
 ```
 
-Si los scripts reales tienen nombres similares, respetar sus nombres existentes y adaptar el flujo sin romper compatibilidad.
+Si el proyecto ya posee una estructura consolidada, respetar nombres y convenciones existentes. Adaptar el flujo sin romper compatibilidad.
 
-## Flujo De Trabajo
+---
 
-### 1. Configuracion
+# Flujo General
 
-- Centralizar paths, semillas, fechas de corte, parametros de target, poblaciones, nombres de archivos y librerias en `00_config.R`.
-- Usar `00_run_pipeline.R` para ejecutar el proceso completo en orden.
-- Hacer que cada script pueda correr de forma independiente despues de cargar la configuracion.
+## 1. Configuración
 
-### 2. Ingesta Y Target
+Centralizar en `00_config.R`:
 
-En `01_ingesta_y_target.R`:
+* Paths.
+* Seeds (`set.seed()` explícito).
+* Fechas de observación y performance.
+* Definición de target.
+* Parámetros de scorecard.
+* Umbrales de calidad.
+* Librerías.
 
-- Cargar fuentes base y conservar una tabla de auditoria de filas, claves, fechas y duplicados.
-- Definir claramente el target: evento malo, ventana de observacion, ventana de performance, exclusiones e indeterminados.
-- Crear variables como `target`, `bad`, `good`, `indeterminate`, `sample_flag`, `periodo_obs` y `periodo_perf` cuando apliquen.
-- Validar conteos por poblacion, distribucion good/bad/indeterminado, tasa de malos, duplicados y consistencia temporal.
+El pipeline completo debe ejecutarse desde `00_run_pipeline.R`. Cada script debe poder correr de forma independiente después de cargar la configuración.
 
-### 3. Integracion De Datos
+---
 
-En `02_bcu_integracion_datos.R`:
+# Quality Gates
 
-- Integrar datos externos o BCU por claves y fechas correctas.
-- Evitar usar informacion posterior a la fecha de observacion.
-- Mantener trazabilidad de joins, cobertura, registros no matcheados y variables agregadas.
-- Validar cobertura por fuente, tasas de match, missingness inducida, duplicacion post-join y consistencia de fechas.
+Antes de avanzar entre etapas, validar los controles correspondientes. Si algún control falla:
 
-### 4. Limpieza Y Feature Engineering
+```r
+stop("Quality Gate Failed: <descripción>")
+```
 
-En `03_limpieza_y_features.R`:
+## Gate: Ingesta
 
-- Estandarizar tipos, unidades, categorias, outliers y valores especiales.
-- Crear features con sentido crediticio: antiguedad, mora historica, utilizacion, endeudamiento, capacidad de pago, consultas, comportamiento reciente, saldos, ratios y tendencias.
-- Separar variables candidatas, variables excluidas y motivos de exclusion.
-- Revisar missingness, rangos, cardinalidad, outliers, distribuciones, estabilidad por periodo y relacion preliminar con target.
+* Sin duplicados de clave principal.
+* Target definido.
+* Ventanas válidas.
+* Tasa de malos razonable.
 
-### 5. WOE, IV Y Binning
+## Gate: Integración
 
-- Construir bins interpretables, estables y con volumen suficiente.
-- Buscar monotonicidad razonable del bad rate cuando tenga sentido de negocio.
-- Calcular WOE e IV por variable.
-- Registrar merges de bins, bins especiales, missing, outliers y justificacion de decisiones.
-- Excluir variables por bajo IV, inestabilidad, alta correlacion, leakage, mala interpretacion o debilidad operacional.
+* Cobertura de joins documentada.
+* Porcentaje de no-match controlado.
+* Integridad temporal verificada.
 
-### 6. Modelizacion
+## Gate: Features
 
-En `04_modelizacion.R`:
+* Leakage = 0.
+* Missing documentados.
+* Variables finales identificadas.
 
-- Separar development, validation y out-of-time si existen fechas suficientes.
-- Entrenar una regresion logistica interpretable, preferentemente con `rms::lrm` si el proyecto ya sigue esa convencion.
-- Controlar signo esperado, significancia, colinealidad, estabilidad y aporte incremental.
-- Guardar modelo `.rds`, transformaciones, metadata de variables, bins y parametros de score.
+## Gate: Modelización
 
-Reportar como minimo:
+* Convergencia verificada.
+* Signos coherentes con expectativas de negocio.
+* Performance mínima alcanzada.
 
-- AUC/Gini, KS, matriz de confusion o performance por umbral si aplica.
-- Lift o deciles de score.
-- Coeficientes, odds ratios o interpretacion de drivers.
-- Validar discriminacion con KS, AUC/Gini y deciles.
-- Calcular PSI de score y variables relevantes entre desarrollo, validacion, OOT y periodos recientes.
+---
 
-### 7. Validacion, PSI Y Monitoreo
+## 2. Ingesta y Target
 
-- Revisar calibracion, bad rate por banda, estabilidad de bins y drift de poblacion.
-- Preparar strategy tables con bandas de score, tasas de aprobacion, bad rate, odds, volumen, acumulados y tradeoffs.
-- Comparacion train/validation/OOT.
+En `01_ingesta_y_target.R`.
 
-### 8. Informe Cliente
+Documentar:
 
-En `05_informe_cliente.R` o R Markdown/Quarto:
+* Población elegible.
+* Exclusiones.
+* Fecha de observación.
+* Ventana de performance.
+* Definición de default.
+* Criterios regulatorios.
 
-- Generar un HTML final estilo informe ejecutivo.
-- Incluir objetivo, datos, poblacion, definicion de target, metodologia, validaciones, modelo final, drivers, estrategia sugerida, monitoreo y anexos tecnicos.
-- Mostrar tablas y graficos que soporten decisiones, no metricas sueltas sin interpretacion.
-- Separar conclusiones ejecutivas de anexos tecnicos.
+Crear variables:
 
-## Funciones Compartidas
+```r
+target
+bad
+good
+indeterminate
+sample_flag
+periodo_obs
+periodo_perf
+```
 
-Usar `mis_funciones.r` para helpers reutilizables:
+Validar:
 
-- lectura/escritura segura,
-- auditorias de tablas,
-- calculo de WOE/IV,
-- KS/AUC/Gini,
-- PSI,
-- tablas de estrategia,
-- graficos estandar,
-- exportacion de reportes.
+* Conteos por población.
+* Bad rate.
+* Duplicados.
+* Consistencia temporal.
+* Distribución de cohortes.
 
-Evitar duplicar logica entre scripts si puede vivir como funcion clara y testeable.
+Generar:
 
-## Entregables
+```r
+EDA/auditoria_target.csv
+```
+
+---
+
+## 3. Integración de Datos
+
+En `02_integracion_datos.R`.
+
+Documentar:
+
+* Fuentes.
+* Fecha de snapshot.
+* Claves de join.
+* Reglas de matching.
+
+Validar:
+
+* Cobertura y porcentaje de no-match.
+* Duplicados generados por el join.
+* Integridad temporal: nunca usar información posterior a la fecha de observación.
+
+Generar:
+
+```r
+EDA/integration_log.csv
+```
+
+---
+
+## 4. Limpieza y Feature Engineering
+
+En `03_limpieza_y_features.R`.
+
+Realizar:
+
+* Estandarización de tipos, unidades y categorías.
+* Imputación documentada.
+* Tratamiento de outliers y valores especiales.
+* Consolidación de categorías con bajo volumen.
+
+Construir variables con sentido crediticio:
+
+* Utilización.
+* Endeudamiento.
+* Capacidad de pago.
+* Comportamiento reciente.
+* Recencia, frecuencia, tendencias.
+* Ratios y antigüedad.
+* Concentración, consultas, saldos.
+* Mora histórica.
+
+Mantener y guardar:
+
+```r
+candidate_variables   # variables que entran al análisis
+excluded_variables    # variables descartadas con motivo
+```
+
+---
+
+## 5. WOE, IV y Binning
+
+Construir bins:
+
+* Interpretables.
+* Estables.
+* Con volumen suficiente.
+
+Aplicar monotonicidad cuando tenga sentido crediticio (utilización ↑ ⇒ riesgo ↑, mora ↑ ⇒ riesgo ↑). Si se rompe monotonicidad, documentar el motivo explícitamente.
+
+Calcular WOE, IV y Bad Rate por bin.
+
+Guardar:
+
+```r
+EDA/binning_log.csv
+```
+
+Columnas:
+
+```text
+variable | bin_id | lower | upper | woe | iv | n_obs | bad_rate | decision_note
+```
+
+---
+
+### Exclusion Log
+
+Documentar todas las variables excluidas en:
+
+```r
+EDA/exclusion_log.csv
+```
+
+Columnas:
+
+```text
+variable | reason | iv | stability_metric | correlation | business_justification
+```
+
+Motivos típicos:
+
+* Leakage.
+* IV bajo.
+* Inestabilidad.
+* Correlación alta con otra variable seleccionada.
+* No operable en producción.
+* Sin justificación de negocio.
+
+---
+
+## 6. Champion vs Challenger
+
+Nunca evaluar un único modelo cuando sea posible. Comparar al menos:
+
+* Logistic WOE.
+* Logistic sin WOE.
+* Árbol de decisión.
+* Random Forest.
+* XGBoost interpretable.
+
+Seleccionar el champion considerando:
+
+* Performance (AUC, KS, Gini).
+* Interpretabilidad para negocio y auditoría.
+* Estabilidad temporal.
+* Gobernanza y cumplimiento regulatorio.
+
+Guardar:
+
+```r
+EDA/model_comparison.csv
+```
+
+---
+
+## 7. Reject Inference
+
+Cuando se trate de originación, documentar:
+
+* Volumen de aprobados, rechazados y tasa de aceptación.
+
+Evaluar los enfoques disponibles:
+
+* Parceling.
+* Reweighting.
+* Fuzzy Augmentation.
+
+Si no se realiza reject inference, documentar explícitamente las limitaciones y el sesgo potencial.
+
+---
+
+## 8. Modelización
+
+En `04_modelizacion.R`.
+
+Si el proyecto ya usa una función específica (`glm`, `rms::lrm`, `scorecard::lr_model`), usarla para preservar convenciones. Si no existe convención, usar por defecto:
+
+```r
+rms::lrm()
+```
+
+Validar:
+
+* Signo esperado por variable.
+* Significancia estadística.
+* Colinealidad y VIF.
+* Estabilidad de coeficientes.
+
+Guardar:
+
+```r
+modelos/modelo_final.rds
+modelos/metadata_modelo.rds
+```
+
+---
+
+### Validaciones Mínimas
+
+Calcular en train, validation y OOT:
+
+* AUC / Gini.
+* KS.
+* Lift y Gain.
+* Deciles de score.
+* Odds por banda.
+
+Guardar:
+
+```r
+EDA/performance_summary.csv
+```
+
+---
+
+### Calibración
+
+Además de discriminación, calcular:
+
+* Calibration Curve.
+* Brier Score.
+* Test de Hosmer-Lemeshow.
+* Predicted vs Observed Bad Rate por banda.
+
+Guardar:
+
+```r
+EDA/calibration_summary.csv
+```
+
+---
+
+## 9. Scorecard
+
+Cuando corresponda generar scorecard, documentar:
+
+* PDO (Points to Double the Odds).
+* Base Score.
+* Base Odds.
+* Factor.
+* Offset.
+
+Guardar:
+
+```r
+EDA/scorecard_points.csv
+```
+
+Columnas:
+
+```text
+variable | bin | woe | points
+```
+
+Guardar también:
+
+```r
+modelos/scorecard.rds
+```
+
+---
+
+## 10. Strategy Tables
+
+Generar automáticamente tablas con:
+
+* Banda de score.
+* Volumen y porcentaje.
+* Bad rate.
+* Approval rate / Rejection rate.
+* Odds.
+* Expected loss.
+* Acumulados.
+
+Evaluar múltiples cutoffs e identificar perfiles:
+
+* Conservador.
+* Comercial.
+* Agresivo.
+
+Mostrar trade-offs explícitamente.
+
+Guardar:
+
+```r
+EDA/strategy_tables.csv
+```
+
+---
+
+## 11. Validación OOT
+
+Si existen períodos suficientes, separar:
+
+```text
+Development / Validation / OOT
+```
+
+Si no existe OOT: documentarlo explícitamente, ejecutar K-Fold Cross Validation como control alternativo, e indicar "OOT pendiente" en el informe.
+
+---
+
+## 12. PSI y Monitoreo
+
+En `05_validacion_y_monitoreo.R`.
+
+Calcular:
+
+* PSI de score.
+* PSI por variable relevante.
+* Drift de población.
+* Drift de target.
+* Drift por bandas de score.
+
+Interpretación estándar:
+
+```text
+PSI < 0.10          → Estable
+0.10 <= PSI < 0.25  → Monitorear
+PSI >= 0.25         → Investigar / considerar recalibración
+```
+
+Generar:
+
+```r
+EDA/psi_summary.csv
+EDA/top_drift_variables.csv
+```
+
+---
+
+## 13. Monitoreo Continuo
+
+Preparar framework para seguimiento mensual de:
+
+* PSI de score.
+* KS.
+* Bad Rate por cohorte.
+* Calibración.
+
+Generar:
+
+```r
+EDA/monitoring_dashboard.csv
+```
+
+---
+
+## 14. Model Governance
+
+Mantener registro en:
+
+```r
+governance/model_registry.csv
+```
+
+Columnas:
+
+```text
+model_name | version | build_date | developer | business_owner | target_definition |
+population | variables_finales | auc | ks | oot_auc | oot_ks | deployment_date | status
+```
+
+Registrar nuevas versiones, recalibraciones y reemplazos.
+
+---
+
+## 15. Informe Cliente
+
+En `06_informe.R`.
+
+Generar informe HTML ejecutivo con diseño:
+
+* Minimalista, estilo macOS / suizo.
+* Amplio espacio en blanco.
+* Tipografía del sistema:
+
+```css
+-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif
+```
+
+* SF Mono o equivalente para tablas y datos numéricos.
+* Colores neutros, contrastes suaves. Evitar colores brillantes o fondos oscuros.
+
+---
+
+### Contenido Ejecutivo
+
+Incluir:
+
+* Objetivo y contexto.
+* Datos utilizados y población.
+* Definición de target.
+* Metodología.
+* Variables relevantes y drivers.
+* Performance (train / validation / OOT).
+* Strategy Tables y cutoffs recomendados.
+* Calibración.
+* Recomendaciones.
+* Riesgos metodológicos.
+* Próximos pasos y monitoreo.
+
+---
+
+### Separación Ejecutivo / Técnico
+
+* **Sección ejecutiva**: para negocio y alta dirección. Foco en insights, estrategia y recomendaciones.
+* **Anexos técnicos**: para riesgo, auditoría y validación independiente. Incluye binning, exclusion log, coeficientes, PSI, calibración y governance.
+
+---
+
+### Gráficos
+
+Estilo BBC / The Economist:
+
+* Minimalistas.
+* Etiquetas claras.
+* Sin gridlines innecesarios.
+* Foco en storytelling e interpretación.
+
+Evitar colores estridentes o decoraciones que distraigan del mensaje.
+
+---
+
+# Funciones Compartidas
+
+Usar `mis_funciones.R` para helpers reutilizables:
+
+* Lectura/escritura segura.
+* Auditorías de tablas.
+* Cálculo de WOE/IV.
+* KS, AUC, Gini, Lift.
+* PSI.
+* Strategy Tables.
+* Scorecard.
+* Exportaciones.
+
+**Importante:** Antes de generar código que use `source("mis_funciones.R")`, confirmar que el archivo existe. Si no existe, incluir la función inline con una nota o solicitar su creación previa. No duplicar lógica entre scripts si puede vivir como función clara y testeable.
+
+---
+
+# Entregables Esperados
 
 Al finalizar, producir o dejar preparado:
 
-- pipeline reproducible,
-- outputs tecnicos,
-- tablas de auditoria,
-- graficos,
-- modelo `.rds`,
-- validacion train/validation/OOT,
-- monitoreo PSI/KS,
-- strategy tables,
-- informe HTML final para cliente.
+* Pipeline reproducible (`00_run_pipeline.R`).
+* Auditorías y logs (`auditoria_target`, `integration_log`, `binning_log`, `exclusion_log`).
+* Comparación de modelos (`model_comparison.csv`).
+* Modelo champion y challengers (`.rds`).
+* Scorecard (`scorecard.rds`, `scorecard_points.csv`).
+* Strategy tables (`strategy_tables.csv`).
+* Validación train / validation / OOT (`performance_summary.csv`).
+* Calibración (`calibration_summary.csv`).
+* PSI y monitoreo (`psi_summary.csv`, `monitoring_dashboard.csv`).
+* Governance (`model_registry.csv`).
+* Informe HTML ejecutivo con anexos técnicos.
 
-## Estilo De Respuesta
+---
 
-- Responder en espanol si el usuario trabaja en espanol.
-- Ser concreto, tecnico y orientado a negocio.
-- Cuando edites codigo, conservar nombres y convenciones existentes.
-- Explicar riesgos crediticios o metodologicos con claridad: leakage, mala definicion de target, baja estabilidad, sobreajuste, variables no operables o reglas dificiles de justificar.
+# Estilo de Respuesta
+
+* Responder en el idioma del usuario.
+* Mantener tono técnico y orientado a negocio.
+* Preservar convenciones existentes del proyecto.
+* No cambiar librerías, estructuras o nomenclaturas sin necesidad explícita.
+* Explicar claramente riesgos metodológicos: leakage, mala definición de target, baja estabilidad, sobreajuste, variables no operables.
+* Cuando exista conflicto entre performance y explicabilidad, documentar explícitamente el trade-off y justificar la decisión.
+* Todo resultado debe poder ser defendido frente a negocio, auditoría, validación independiente y regulador.

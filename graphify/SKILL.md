@@ -66,56 +66,94 @@ Follow these steps in order. Do not skip steps.
 # Detect Python with graphify — uv/pipx-aware (fixes #831)
 New-Item -ItemType Directory -Force -Path graphify-out | Out-Null
 $GRAPHIFY_PYTHON = $null
+$GRAPHIFY_GLOBAL_CACHE = Join-Path $HOME ".claude\graphify_python"
 
-function Find-GraphifyPython {
-    # 1. uv tool install — 'uv tool dir' is authoritative, respects UV_TOOL_DIR automatically
-    if (Get-Command uv -ErrorAction SilentlyContinue) {
-        $uvDir = (uv tool dir 2>$null).Trim()
-        if ($uvDir) {
-            $py = Join-Path $uvDir "graphifyy\Scripts\python.exe"
-            if (Test-Path $py) {
-                & $py -c "import graphify" 2>$null
-                if ($LASTEXITCODE -eq 0) { return $py }
-            }
-        }
-    }
-    # 2. pipx install — 'pipx environment' respects PIPX_HOME automatically
-    if (Get-Command pipx -ErrorAction SilentlyContinue) {
-        $venvs = (pipx environment --value PIPX_LOCAL_VENVS 2>$null).Trim()
-        if ($venvs) {
-            $py = Join-Path $venvs "graphifyy\Scripts\python.exe"
-            if (Test-Path $py) {
-                & $py -c "import graphify" 2>$null
-                if ($LASTEXITCODE -eq 0) { return $py }
-            }
-        }
-    }
-    # 3. Active venv / conda / pip-into-current-env
-    $pyCmd = Get-Command python -ErrorAction SilentlyContinue
-    if ($pyCmd) {
-        & $pyCmd.Source -c "import graphify" 2>$null
-        if ($LASTEXITCODE -eq 0) {
-            return (& $pyCmd.Source -c "import sys; print(sys.executable)").Trim()
-        }
-    }
-    return $null
+function Save-GraphifyPython($path) {
+    $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+    [System.IO.File]::WriteAllText((Resolve-Path graphify-out).Path + '\.graphify_python', $path, $utf8NoBom)
+    [System.IO.File]::WriteAllText($GRAPHIFY_GLOBAL_CACHE, $path, $utf8NoBom)
 }
 
-# Try to find the right Python (uv → pipx → active env)
-$GRAPHIFY_PYTHON = Find-GraphifyPython
+function Test-GraphifyPython($path) {
+    if (-not $path -or -not (Test-Path $path)) { return $false }
+    & $path -c "import graphify" 2>$null
+    return $LASTEXITCODE -eq 0
+}
 
-# Not found — install then re-detect
+# Fast path 1: project-local cache
+if (Test-Path graphify-out\.graphify_python) {
+    $cached = (Get-Content graphify-out\.graphify_python -Raw).Trim()
+    if (Test-GraphifyPython $cached) { $GRAPHIFY_PYTHON = $cached }
+}
+
+# Fast path 2: global cache (works for new projects)
+if (-not $GRAPHIFY_PYTHON -and (Test-Path $GRAPHIFY_GLOBAL_CACHE)) {
+    $cached = (Get-Content $GRAPHIFY_GLOBAL_CACHE -Raw).Trim()
+    if (Test-GraphifyPython $cached) { $GRAPHIFY_PYTHON = $cached }
+}
+
 if (-not $GRAPHIFY_PYTHON) {
-    if (Get-Command uv -ErrorAction SilentlyContinue) {
-        uv tool install --upgrade graphifyy -q 2>&1 | Select-Object -Last 3
-    } else {
-        pip install graphifyy -q 2>&1 | Select-Object -Last 3
+    function Find-GraphifyPython {
+        # 1. uv tool install — 'uv tool dir' is authoritative, respects UV_TOOL_DIR automatically
+        if (Get-Command uv -ErrorAction SilentlyContinue) {
+            $uvDir = (uv tool dir 2>$null).Trim()
+            if ($uvDir) {
+                $py = Join-Path $uvDir "graphifyy\Scripts\python.exe"
+                if (Test-Path $py) {
+                    & $py -c "import graphify" 2>$null
+                    if ($LASTEXITCODE -eq 0) { return $py }
+                }
+            }
+        }
+        # 2. pipx install — 'pipx environment' respects PIPX_HOME automatically
+        if (Get-Command pipx -ErrorAction SilentlyContinue) {
+            $venvs = (pipx environment --value PIPX_LOCAL_VENVS 2>$null).Trim()
+            if ($venvs) {
+                $py = Join-Path $venvs "graphifyy\Scripts\python.exe"
+                if (Test-Path $py) {
+                    & $py -c "import graphify" 2>$null
+                    if ($LASTEXITCODE -eq 0) { return $py }
+                }
+            }
+        }
+        # 3. py launcher — tries each installed Python version (covers pip --user installs)
+        if (Get-Command py -ErrorAction SilentlyContinue) {
+            $versions = (py --list 2>$null) -replace '^\s*-V:', '' -replace '\s.*$', '' | Where-Object { $_ -match '^\d' }
+            foreach ($ver in $versions) {
+                $pyPath = (py "-$ver" -c "import sys; print(sys.executable)" 2>$null).Trim()
+                if ($pyPath) {
+                    & $pyPath -c "import graphify" 2>$null
+                    if ($LASTEXITCODE -eq 0) { return $pyPath }
+                }
+            }
+        }
+        # 4. Active venv / conda / pip-into-current-env
+        $pyCmd = Get-Command python -ErrorAction SilentlyContinue
+        if ($pyCmd) {
+            & $pyCmd.Source -c "import graphify" 2>$null
+            if ($LASTEXITCODE -eq 0) {
+                return (& $pyCmd.Source -c "import sys; print(sys.executable)").Trim()
+            }
+        }
+        return $null
     }
-    $GRAPHIFY_PYTHON = Find-GraphifyPython
-}
 
-# Save interpreter path — all subsequent steps read this
-$GRAPHIFY_PYTHON | Out-File -FilePath graphify-out\.graphify_python -Encoding utf8 -NoNewline
+    # Try to find the right Python (uv → pipx → py launcher → active env)
+    $GRAPHIFY_PYTHON = Find-GraphifyPython
+
+    # Not found — install then re-detect
+    if (-not $GRAPHIFY_PYTHON) {
+        if (Get-Command uv -ErrorAction SilentlyContinue) {
+            uv tool install --upgrade graphifyy -q 2>&1 | Select-Object -Last 3
+        } else {
+            pip install graphifyy -q 2>&1 | Select-Object -Last 3
+        }
+        $GRAPHIFY_PYTHON = Find-GraphifyPython
+    }
+
+    # Save to both local and global cache
+    if ($GRAPHIFY_PYTHON) { Save-GraphifyPython $GRAPHIFY_PYTHON }
+}
 ```
 
 If the import succeeds, print nothing and move straight to Step 2.
