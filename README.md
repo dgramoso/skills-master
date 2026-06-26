@@ -5,7 +5,8 @@ Repositorio maestro de IA-Skills
 
 | Skill | Descripción |
 |---|---|
-| `analytics-workflow` | Metodología SDD + Ponytail + Skills para proyectos de analítica (modelización, credit scoring, churn, segmentación) |
+| `metodologia-credit-scoring` | Metodología completa SDD + Ponytail + Skills específica para proyectos de credit scoring: flujo, specs, quality gates, governance, informe con Claude API |
+| `analytics-workflow` | Metodología SDD + Ponytail + Skills genérica para cualquier proyecto analítico (churn, fraude, segmentación, dashboards) |
 | `credit-scoring` | Guía metodológica completa de credit scoring Siddiqi: WOE/IV, scorecard, PSI, governance |
 | `advanced-analytics` | Workflow analítico de negocio: desde datos crudos hasta conclusiones accionables |
 | `grill-with-docs` | Stress-test de specs contra documentación y dominio del proyecto |
