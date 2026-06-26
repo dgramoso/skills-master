@@ -758,6 +758,48 @@ Usar `mis_funciones.R` para helpers reutilizables:
 * Strategy Tables.
 * Scorecard.
 * Exportaciones.
+* Interpretaciones automáticas vía Claude API (`llamar_claude()`).
+
+### `llamar_claude()` — interpretación automática en el informe
+
+Incluir en `mis_funciones.R` para generar narrativa dinámica en `06_informe.R`:
+
+```r
+llamar_claude <- function(prompt, max_tokens = 400) {
+  api_key <- Sys.getenv("ANTHROPIC_API_KEY")
+  if (!nzchar(api_key)) {
+    warning("ANTHROPIC_API_KEY no configurada — saltando interpretación automática")
+    return("")
+  }
+  tryCatch({
+    resp <- httr2::request("https://api.anthropic.com/v1/messages") |>
+      httr2::req_headers(
+        "x-api-key"         = api_key,
+        "anthropic-version" = "2023-06-01",
+        "content-type"      = "application/json"
+      ) |>
+      httr2::req_body_json(list(
+        model      = "claude-haiku-4-5-20251001",
+        max_tokens = max_tokens,
+        messages   = list(list(role = "user", content = prompt))
+      )) |>
+      httr2::req_perform() |>
+      httr2::resp_body_json()
+    resp$content[[1]]$text
+  }, error = function(e) {
+    warning("Error llamando a Claude API: ", e$message)
+    ""
+  })
+}
+```
+
+Secciones a generar automáticamente en el informe:
+- **Performance**: interpretación del Gini/AUC/KS en función de las variables reales
+- **Calibración**: si el modelo está bien calibrado y dónde hay mayor desvío
+- **PSI**: estabilidad e implicancias para producción
+- **Recomendaciones**: cutoffs, mejoras y monitoreo con los números reales del modelo
+
+La función devuelve `""` si no hay API key, sin romper el pipeline. Configurar `ANTHROPIC_API_KEY` en `.Renviron` para que cargue automáticamente en cada sesión de R.
 
 **Importante:** Antes de generar código que use `source("mis_funciones.R")`, confirmar que el archivo existe. Si no existe, incluir la función inline con una nota o solicitar su creación previa. No duplicar lógica entre scripts si puede vivir como función clara y testeable.
 
