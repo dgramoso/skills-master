@@ -212,6 +212,12 @@ Para cada etapa del pipeline:
 
 6. Commit del script
    → git commit -m "feat: script 0N_nombre — descripción breve"
+
+7. /handoff (al cerrar la sesión)
+   → compacta la conversación en un documento de transferencia
+   → la próxima sesión lo lee para retomar sin perder contexto
+   → útil también para pasar trabajo a otro miembro del equipo
+   → /handoff "próximo objetivo" para orientar la transferencia
 ```
 
 ---
@@ -473,6 +479,7 @@ mkdir -p specs scripts datos/raw datos/processed EDA modelos/v1 \
 | Después de cada script | `/code-review` |
 | Proyecto con equipo / cliente | `/to-issues` |
 | Pipeline completo | `/code-review ultra` → `/improve-codebase-architecture` → `/graphify` |
+| Cerrar sesión / transferir trabajo | `/handoff` o `/handoff "próximo objetivo"` |
 | Retomar proyecto pausado | `graphify query "<pregunta>"` |
 | Funciones reutilizables | `/tdd` |
 | Modo de trabajo permanente | `ponytail full` |
