@@ -38,6 +38,14 @@ Priorizar:
 ```text
 credit_scoring/
 |
+|-- specs/
+|   |-- 00_proyecto.md
+|   |-- 01_ingesta_y_target.md
+|   |-- 02_integracion_datos.md
+|   |-- 03_limpieza_y_features.md
+|   |-- 04_modelizacion.md
+|   `-- 05_validacion_y_monitoreo.md
+|
 |-- scripts/
 |   |-- 00_config.R
 |   |-- 00_run_pipeline.R
@@ -69,6 +77,177 @@ credit_scoring/
 ```
 
 Si el proyecto ya posee una estructura consolidada, respetar nombres y convenciones existentes. Adaptar el flujo sin romper compatibilidad.
+
+---
+
+# Specs-Driven Development (SDD)
+
+Antes de implementar cualquier script, crear y completar la spec correspondiente en `specs/`. El código existe para cumplir la spec — no al revés.
+
+## Flujo obligatorio
+
+```
+1. Completar specs/<etapa>.md        ← ANTES de escribir código
+2. Confirmar con el usuario si hay decisiones metodológicas abiertas
+3. Implementar el script             ← cumpliendo precondiciones y postcondiciones
+4. Incluir quality gates como código ejecutable que falla explícitamente
+```
+
+## Template de spec por etapa
+
+```markdown
+# Spec — <nombre_script>.R
+
+## Objetivo
+[Una oración que describa qué resuelve esta etapa]
+
+## Precondiciones
+- [Archivo o condición que debe existir antes de correr]
+- [Columnas requeridas del input]
+
+## Postcondiciones
+- [Archivos que este script debe producir]
+- [Columnas que deben estar presentes en el output]
+
+## Quality Gate — falla si:
+- [Condición 1]
+- [Condición 2]
+
+## Invariantes
+- [Regla que nunca debe romperse, ej: no usar datos posteriores a periodo_obs]
+
+## Decisiones metodológicas
+- [Decisión tomada]: [justificación]
+
+## Output esperado
+| Archivo | Columnas clave | Filas esperadas |
+|---|---|---|
+| [nombre] | [columnas] | [estimado] |
+```
+
+## Specs pre-llenadas por etapa
+
+### specs/01_ingesta_y_target.md
+
+```markdown
+# Spec — 01_ingesta_y_target.R
+
+## Precondiciones
+- datos/raw/ contiene el archivo de solicitudes o cartera
+- Columnas mínimas: id_cliente, fecha_solicitud o fecha_obs, estado_cuenta
+
+## Postcondiciones
+- datos/processed/base_target.rds con columnas:
+  id_cliente, target, bad, good, indeterminate,
+  sample_flag, periodo_obs, periodo_perf
+- EDA/auditoria_target.csv generado
+
+## Quality Gate — falla si:
+- Duplicados en id_cliente
+- bad_rate fuera de [3%, 40%]
+- Ventana de performance < 12 meses
+- target con NA en población elegible
+
+## Invariantes
+- No usar información posterior a periodo_obs
+- Exclusiones documentadas con motivo explícito
+```
+
+### specs/02_integracion_datos.md
+
+```markdown
+# Spec — 02_integracion_datos.R
+
+## Precondiciones
+- datos/processed/base_target.rds existe y cumple su spec
+- Fuentes externas disponibles con fecha de snapshot <= periodo_obs
+
+## Postcondiciones
+- datos/processed/base_integrada.rds
+- EDA/integration_log.csv con cobertura y porcentaje de no-match
+
+## Quality Gate — falla si:
+- No-match supera umbral definido en 00_config.R
+- Duplicados generados por el join
+- Cualquier variable con fecha posterior a periodo_obs
+
+## Invariantes
+- Integridad temporal: nunca usar datos posteriores a periodo_obs
+```
+
+### specs/03_limpieza_y_features.md
+
+```markdown
+# Spec — 03_limpieza_y_features.R
+
+## Precondiciones
+- datos/processed/base_integrada.rds existe y cumple su spec
+
+## Postcondiciones
+- datos/processed/base_features.rds con candidate_variables
+- EDA/exclusion_log.csv con variables descartadas y motivo
+- EDA/binning_log.csv con WOE, IV y bad_rate por bin
+
+## Quality Gate — falla si:
+- Leakage detectado (variable con fecha > periodo_obs)
+- Variable con missing > 80% en candidate_variables
+- IV de alguna variable seleccionada < umbral definido
+
+## Invariantes
+- Toda exclusión debe tener motivo en exclusion_log
+- Monotonicidad documentada si se rompe
+```
+
+### specs/04_modelizacion.md
+
+```markdown
+# Spec — 04_modelizacion.R
+
+## Precondiciones
+- datos/processed/base_features.rds existe y cumple su spec
+- EDA/binning_log.csv y EDA/exclusion_log.csv generados
+
+## Postcondiciones
+- modelos/modelo_final.rds
+- modelos/metadata_modelo.rds
+- EDA/model_comparison.csv con champion y challengers
+- EDA/performance_summary.csv con AUC, KS, Gini en train/val/OOT
+- EDA/calibration_summary.csv
+
+## Quality Gate — falla si:
+- AUC < umbral definido en 00_config.R
+- Signo de algún coeficiente contradice expectativa de negocio
+- VIF > 10 en alguna variable del modelo final
+- Convergencia no alcanzada
+
+## Invariantes
+- Documentar trade-off performance vs interpretabilidad si aplica
+- Champion seleccionado con justificación explícita
+```
+
+### specs/05_validacion_y_monitoreo.md
+
+```markdown
+# Spec — 05_validacion_y_monitoreo.R
+
+## Precondiciones
+- modelos/modelo_final.rds existe
+- Datos de período posterior disponibles para PSI
+
+## Postcondiciones
+- EDA/psi_summary.csv
+- EDA/top_drift_variables.csv
+- EDA/monitoring_dashboard.csv
+- governance/model_registry.csv actualizado
+
+## Quality Gate — falla si:
+- PSI de score >= 0.25 sin documentación de causa
+- KS OOT cae más de 10 puntos respecto a desarrollo
+
+## Invariantes
+- PSI < 0.10: estable / 0.10-0.25: monitorear / >= 0.25: investigar
+- Todo cambio de estado en model_registry debe tener fecha y responsable
+```
 
 ---
 
