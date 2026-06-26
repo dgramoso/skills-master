@@ -66,6 +66,10 @@ nombre_proyecto/
 Inicio del proyecto:
   /setup-matt-pocock-skills   ← una sola vez, configura el repo
 
+Definición de alcance (una sola vez, antes de cualquier spec):
+  /to-prd                     ← dump libre del proyecto → genera specs/00_proyecto.md
+  /grill-with-docs            ← cuestiona el alcance, actualiza CONTEXT.md con decisiones de negocio
+
 Por cada etapa del pipeline:
   1. /to-prd                  ← convierte descripción en spec borrador
   2. /grill-with-docs         ← cuestiona la spec antes del código

@@ -87,11 +87,29 @@ Antes de implementar cualquier script, crear y completar la spec correspondiente
 ## Flujo obligatorio
 
 ```
+0. Definición de alcance (una sola vez al inicio del proyecto):
+   /to-prd          → dump libre del proyecto en lenguaje natural → specs/00_proyecto.md
+   /grill-with-docs → cuestiona el alcance, actualiza CONTEXT.md con decisiones de negocio
+                      (target, ventanas, población, fuentes, restricciones regulatorias)
+
 1. Completar specs/<etapa>.md        ← ANTES de escribir código
 2. Confirmar con el usuario si hay decisiones metodológicas abiertas
 3. Implementar el script             ← cumpliendo precondiciones y postcondiciones
 4. Incluir quality gates como código ejecutable que falla explícitamente
 ```
+
+### `specs/00_proyecto.md` — output del alcance inicial
+
+Generado por `/to-prd` al inicio. Contiene:
+- Objetivo del modelo y decisión de negocio que habilita
+- Población elegible y exclusiones
+- Fuentes de datos disponibles
+- Definición preliminar de target
+- Restricciones regulatorias o de negocio
+- Qué queda fuera del alcance
+- Preguntas abiertas que `/grill-with-docs` va a resolver
+
+**`/to-prd` con cliente presente:** describís el proyecto en lenguaje natural mientras el cliente habla → Claude genera el borrador → el cliente valida antes de salir de la reunión. Salís con el alcance firmado implícitamente.
 
 ## Template de spec por etapa
 
