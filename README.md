@@ -7,6 +7,12 @@ Repositorio maestro de IA-Skills
 |---|---|
 | `metodologia-credit-scoring` | Metodología completa SDD + Ponytail + Skills específica para proyectos de credit scoring: flujo, specs, quality gates, governance, informe con Claude API |
 | `analytics-workflow` | Metodología SDD + Ponytail + Skills genérica para cualquier proyecto analítico (churn, fraude, segmentación, dashboards) |
+
+## Templates
+
+| Archivo | Uso |
+|---|---|
+| `templates/CLAUDE.md` | Template base de CLAUDE.md para nuevos proyectos — copiar a la raíz del proyecto y completar |
 | `credit-scoring` | Guía metodológica completa de credit scoring Siddiqi: WOE/IV, scorecard, PSI, governance |
 | `advanced-analytics` | Workflow analítico de negocio: desde datos crudos hasta conclusiones accionables |
 | `grill-with-docs` | Stress-test de specs contra documentación y dominio del proyecto |

@@ -337,6 +337,9 @@ Activo (full). No construir abstracciones no pedidas.
 ## Agent skills
 - Issue tracker: [GitHub Issues / local markdown]
 - Context files: CONTEXT.md (dominio), specs/*.md (tareas activas)
+
+## Cierre de sesión
+Antes de cerrar, correr `/handoff "descripción de lo que sigue"`.
 ```
 
 ---
