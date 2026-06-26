@@ -165,7 +165,11 @@ Al finalizar el pipeline:
    → el script corre sin errores desde cero
    → outputs en EDA/ o datos/processed/
 
-5. /code-review (opcional por etapa, obligatorio antes de entrega)
+5. /code-review (opcional por etapa)
+   → revisa el script antes de avanzar a la siguiente etapa
+
+   Al finalizar el pipeline completo (una sola vez):
+   → /code-review ultra   ← revisión profunda multi-agente antes de entregar al cliente
 
 6. Commit del script
    → git commit -m "feat: script 0N_nombre — descripción breve"
