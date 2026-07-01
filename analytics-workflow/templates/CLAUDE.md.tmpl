@@ -1,0 +1,36 @@
+# CLAUDE.md — [nombre_proyecto]
+
+## Contexto
+[Una oración describiendo el proyecto. Ver CONTEXT.md para detalle.]
+
+## Lenguaje
+[R / Python / SQL + R / etc.]
+
+## Metodología
+SDD + Ponytail.
+
+Workflow:
+PRD → specs → grill → issues opcional → código → validación → entrega.
+
+## Regla principal
+No escribir código antes de tener spec grillada.
+
+## Documentación
+- PRD: issue tracker o specs/00_prd_reference.md
+- Specs: specs/*.md
+- Dominio: CONTEXT.md
+- ADRs: docs/adr/
+- Agent config: docs/agents/
+
+## Ponytail
+Activo: full.
+
+No construir abstracciones no pedidas.
+
+## Agent skills
+Ver docs/agents/.
+
+## Cierre de sesión
+Antes de cerrar, correr:
+
+/handoff "descripción de lo que sigue"

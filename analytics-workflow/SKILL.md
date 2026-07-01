@@ -1,412 +1,214 @@
-# Analytics Workflow: SDD + Ponytail + Skills
+---
+name: analytics-workflow
+description: Workflow SDD para proyectos de analítica, machine learning, scoring, segmentación, dashboards y reportería. Define el flujo PRD → specs → grill → issues → código → validación → entrega, con Ponytail, trazabilidad metodológica, reproducibilidad e interpretabilidad.
+disable-model-invocation: true
+---
 
-Metodología de trabajo para proyectos de analítica con Claude Code: carga de datos, ingeniería de atributos, modelización, validación y deployment. Aplica a cualquier proyecto predictivo (credit scoring, churn, fraude, segmentación, dashboards).
+# Analytics Workflow — SDD + Ponytail + Skills
 
-Prioridades permanentes:
-- **Trazabilidad**: toda decisión metodológica queda documentada.
-- **Reproducibilidad**: el pipeline corre de punta a punta sin intervención manual.
-- **Interpretabilidad**: los resultados pueden ser explicados a negocio, auditoría o regulador.
-- **Mínimo código que funciona** (Ponytail): no construir para el futuro.
+Metodología para proyectos de analítica con Claude Code: credit scoring, cobranza inteligente, churn, fraude, segmentación/clustering, dashboards, reportería, modelos supervisados y no supervisados, y pipelines de datos para inteligencia comercial.
+
+**Prioridades permanentes:**
+
+1. **Trazabilidad** — toda decisión metodológica importante queda documentada.
+2. **Reproducibilidad** — el pipeline corre de punta a punta sin intervención manual.
+3. **Interpretabilidad** — los resultados pueden explicarse a negocio, auditoría o regulador.
+4. **Ponytail** — mínimo código que funciona; sin abstracciones ni infraestructura futura innecesaria.
+5. **Separación documental** — PRD, specs, issues, CONTEXT.md y ADRs cumplen roles distintos.
+
+---
+
+## Archivos de referencia
+
+Este `SKILL.md` es el núcleo navegable. El detalle operativo vive en archivos que se cargan cuando hacen falta:
+
+| Cuándo lo necesitás | Archivo |
+|---|---|
+| Detalle y prompts de cada skill (`/to-prd`, grill, issues, code-review…) | `references/skills-detalle.md` |
+| Specs mínimas por tipo de proyecto (supervisado / clustering / dashboard) | `references/specs-por-tipo.md` |
+| Template general de spec | `references/spec-template.md` |
+| Patrones de quality gates + reglas anti-leakage | `references/quality-gates.md` |
+| `00_config.r`, `00_run_pipeline.r`, renv | `references/reproducibilidad.md` |
+| Versionado de modelos, CHANGELOG, `model_registry.csv` | `references/governance.md` |
+| Narrativa automática vía Claude API (`llamar_claude()`) | `references/claude-api.md` |
+| Plantillas copiables | `templates/00_config.r`, `templates/CLAUDE.md.tmpl`, `templates/CHANGELOG.md.tmpl` |
 
 ---
 
 ## Filosofía base
 
-Tres principios en orden de prioridad:
+Tres principios en orden de prioridad.
 
-1. **SDD (Specs-Driven Development)**: toda etapa empieza con una spec escrita y grillada antes del código. El código existe para cumplir la spec — no al revés.
-2. **Ponytail**: mínimo código que funciona. El primer script que pasa los quality gates es el correcto.
-3. **Claude como pair programmer**: Claude implementa. Las decisiones de negocio y metodológicas son del analista.
+**1. Specs-Driven Development.** Toda etapa relevante empieza con una spec escrita y grillada antes del código. El código existe para cumplir la spec; no se reconstruye la spec después de mirar el código.
+
+```text
+No spec → no código.
+Spec sin grill → no código productivo.
+Código que no cumple la spec → código incorrecto.
+```
+
+**2. Ponytail.** Usar el mínimo código que cumple el objetivo y pasa los quality gates. No anticipar necesidades futuras, no refactorizar prematuramente, no crear frameworks salvo duplicación real. Niveles: `full` (default), `lite` (algo más de estructura si el proyecto crecerá), `ultra` (máxima austeridad; scripts simples y directos).
+
+**3. Claude como pair programmer.** Claude implementa, revisa y documenta. El analista decide: problema de negocio, target, población, horizonte, exclusiones, metodología, trade-offs y criterios de aceptación. Claude no inventa decisiones de negocio ni metodológicas críticas.
 
 ---
 
-## Estructura de carpetas (estándar)
+## Jerarquía documental
 
-```
+Cinco niveles con roles distintos:
+
+- **PRD** — documento padre de una iniciativa. Define problema, solución, usuarios, user stories, alcance, fuera de alcance, criterios de éxito y specs hijas. Uno por iniciativa importante (`/to-prd`). No reemplaza a las specs. Ej: nuevo motor de scoring, sistema de cobranza inteligente, dashboard ejecutivo de riesgo.
+- **Specs** — documentos operativos: cómo se implementa un componente analítico concreto (target, data snapshot, feature engineering, modeling/validation, deployment, monitoring, report). Cada spec se grilla antes de codear.
+- **Issues** — unidades ejecutables derivadas de specs aprobadas. Opcionales: solo con equipo, backlog visible, ejecución por agentes o trazabilidad con cliente.
+- **CONTEXT.md** — memoria estable del dominio: glosario, reglas de negocio persistentes, definiciones reutilizables, convenciones. No es basurero de decisiones transitorias.
+- **ADRs** (`docs/adr/`) — decisiones arquitectónicas duraderas. Ej: batch vs real-time, scorecard interpretable vs black-box, Git + `modelos/vN/` como registry liviano.
+
+### Persistencia de decisiones
+
+Durante `/grill-with-docs`, clasificar cada respuesta del analista **antes** de documentarla:
+
+| Tipo de decisión | Documento destino | Ejemplo |
+|---|---|---|
+| Regla estable de negocio/dominio | `CONTEXT.md` | "El score operativo se expresa de 1 a 1000." |
+| Decisión específica de una feature/modelo | Spec activa | "Para este modelo v1 se usará horizonte de 90 días." |
+| Decisión arquitectónica duradera | `docs/adr/` | "El scoring será batch diario y no real-time." |
+| Trabajo ejecutable | Issue tracker | "Implementar cálculo mensual de PSI." |
+| Hallazgo exploratorio | `EDA/` o informe técnico | "La variable X tiene 42% de missing." |
+
+Regla: **CONTEXT.md no es un basurero de decisiones.** Solo contiene conocimiento reutilizable por futuras features y agentes.
+
+---
+
+## Estructura estándar de carpetas
+
+```text
 nombre_proyecto/
-├── CLAUDE.md              ← contexto del proyecto para Claude (leer cada sesión)
-├── CONTEXT.md             ← dominio, variables, glosario, decisiones tomadas
-├── METODOLOGIA_<tipo>.md  ← referencia metodológica específica del proyecto
+├── CLAUDE.md
+├── CONTEXT.md
+├── METODOLOGIA_<tipo>.md
 │
-├── specs/                 ← una spec por etapa, ANTES de escribir código
-│   ├── 01_ingesta.md
-│   ├── 02_features.md
-│   ├── 03_modelizacion.md
-│   ├── 04_validacion.md
-│   └── 05_informe.md
+├── docs/
+│   ├── agents/            # issue-tracker.md, triage-labels.md, domain.md
+│   └── adr/               # 0001-decision-template.md
 │
-├── scripts/
-│   ├── 00_config.r        ← paths, seeds, umbrales, parámetros centralizados
-│   ├── 00_run_pipeline.r  ← ejecuta todo en orden con un solo comando
-│   ├── mis_funciones.r    ← funciones compartidas entre scripts
-│   └── 01_...05_...r
+├── specs/                 # 00_prd_reference.md, 01_…07_…md
+├── scripts/               # 00_config.r, 00_run_pipeline.r, mis_funciones.r, 01_…07_…r
 │
 ├── datos/
-│   ├── raw/               ← datos originales, NUNCA modificar
-│   └── processed/         ← outputs de scripts (.rds / .parquet / .csv)
+│   ├── raw/               # INMUTABLE
+│   └── processed/
 │
-├── EDA/                   ← todos los CSVs de auditoría y logs
-├── modelos/               ← modelo_final.rds, scorecard.rds, metadata
-│   └── v1/
-├── reportes/              ← informe HTML para el cliente
-├── governance/            ← model_registry.csv
+├── EDA/
+├── modelos/
+│   └── v1/                # modelo_final.rds, metadata_modelo.rds, CHANGELOG.md
+│
+├── reportes/
+├── governance/            # model_registry.csv
 ├── graficos/
 └── logs/
 ```
 
-**Regla:** `datos/raw/` es inmutable. Nunca sobrescribir datos originales.
+Reglas:
+
+* `datos/raw/` es inmutable. Nunca sobrescribir datos originales.
+* Todo output reproducible va a `datos/processed/`, `EDA/`, `modelos/`, `reportes/`, `graficos/` o `logs/`.
+* Todo parámetro que puede cambiar entre proyectos vive en `scripts/00_config.r`.
+* Ningún script depende de pasos manuales invisibles.
 
 ---
 
-## Skills y cuándo invocarlas
+## Workflow por estados
 
-### Orden en un proyecto típico
+Cada proyecto avanza por estados. No saltar un estado salvo decisión explícita documentada.
 
-```
-Inicio del proyecto:
-  /setup-matt-pocock-skills   ← una sola vez, configura el repo
-
-Definición de alcance (una sola vez, antes de cualquier spec):
-  /to-prd                     ← dump libre del proyecto → genera specs/00_proyecto.md
-  /grill-with-docs            ← cuestiona el alcance, actualiza CONTEXT.md con decisiones de negocio
-
-Por cada etapa del pipeline:
-  1. /to-prd                  ← convierte descripción en spec borrador
-  2. /grill-with-docs         ← cuestiona la spec antes del código
-  3. (opcional) /to-issues    ← genera backlog si el proyecto dura semanas
-  4. código                   ← Claude implementa siguiendo la spec
-  5. /code-review             ← revisa el script antes de avanzar
-
-Al modelizar:
-  /credit-scoring             ← metodología Siddiqi (si es credit scoring)
-  /advanced-analytics         ← enfoque de negocio e interpretación
-
-Transversal:
-  ponytail (activo permanente) ← se declara al inicio de sesión, no se invoca
-
-Al finalizar el pipeline:
-  /code-review ultra          ← revisión profunda multi-agente antes de entregar
-  /improve-codebase-architecture ← detecta duplicaciones y refactoriza
-  /graphify                   ← grafo del codebase para navegación
+```text
+intake → prd_created → specs_generated → specs_grilled
+  → issues_created (opcional) → implementation → validation
+  → report → delivery → monitoring
 ```
 
-### Referencia de cada skill
-
-**`/to-prd`** — convierte lenguaje natural en spec estructurada (objetivo, precondiciones, postcondiciones, quality gates, invariantes). Usar antes de cada etapa.
-
-**`/grill-with-docs`** — lee la spec y el CONTEXT.md, hace preguntas críticas una por una, actualiza CONTEXT.md con las decisiones que emergen. Responder una pregunta a la vez. Nunca saltar al código sin grilear la spec.
-
-**`/advanced-analytics`** — exige que cada resultado técnico tenga traducción práctica de negocio. Útil junto a `/credit-scoring` o como guía standalone para proyectos no-crediticios.
-
-**`/credit-scoring`** — guía metodológica completa (Siddiqi): WOE/IV, binning, champion vs challengers, calibración, PSI, scorecard, strategy tables, governance. Solo para proyectos de credit scoring.
-
-**`ponytail`** — modo de trabajo, no skill invocable. Se activa al inicio de sesión: "trabajemos con ponytail activo". Niveles: `full` (default), `lite`, `ultra`.
-
-**`/improve-codebase-architecture`** — revisa el codebase completo al final. Detecta duplicaciones, funciones que deberían ir a `mis_funciones.r`, inconsistencias. Solo cuando todos los scripts están funcionando.
-
-**`/code-review` / `/code-review ultra`** — `/code-review` después de cada script. `/code-review ultra` una sola vez antes de entregar al cliente.
-
-**`/to-issues`** — convierte specs en issues de GitHub. Solo si hay equipo o el cliente quiere visibilidad del backlog.
-
-**`/graphify`** — construye grafo de conocimiento del codebase. Invocar cuando hay ≥ 3 scripts relacionados. Útil al retomar proyectos o para onboarding.
-
-**`/tdd`** — TDD formal solo para funciones reutilizables en `mis_funciones.r`. Los `stop()` en los scripts son TDD implícita.
+| Transición | Condición para avanzar |
+|---|---|
+| `intake` → `prd_created` | PRD documentado y alcance aprobado |
+| `prd_created` → `specs_generated` | Specs hijas identificadas y creadas |
+| `specs_generated` → `specs_grilled` | Cada spec crítica cuestionada con `/grill-with-docs` |
+| `specs_grilled` → `implementation` | No quedan preguntas bloqueantes |
+| `implementation` → `validation` | Pipeline corre punta a punta |
+| `validation` → `report` | Quality gates y métricas mínimas pasan |
+| `report` → `delivery` | Informe revisado, reproducible y entendible |
+| `delivery` → `monitoring` | Registry, changelog y monitoreo definidos |
 
 ---
 
-## Template de spec (usar siempre)
+## Flujo por cada etapa del pipeline
 
-```markdown
-# Spec — nombre_script.r
+```text
+1. Crear o actualizar spec        → references/spec-template.md
+2. Grill con /grill-with-docs     → clasificar decisiones (tabla de persistencia)
+3. Commit de spec                 → git commit -m "spec: 0N_nombre"
+4. Implementar script             → sin funcionalidad fuera de spec
+5. Ejecutar script desde cero     → outputs a datos/processed, EDA, etc.
+6. Verificar outputs y quality gates
+7. /code-review                   → resolver hallazgos críticos
+8. Commit de script               → git commit -m "feat: script 0N_nombre — descripción"
+```
 
-## Objetivo
-[Una oración que describa qué resuelve esta etapa]
+Al terminar el pipeline completo, una sola vez: `/code-review ultra` → informe → delivery → monitoring.
 
-## Precondiciones
-- [Archivo que debe existir antes de correr]
-- [Columnas o condiciones requeridas del input]
+---
 
-## Postcondiciones
-- [Archivos que este script debe producir]
-- [Columnas que deben estar presentes en el output]
+## Skills: cuándo invocar cada una
 
-## Quality Gates — falla con stop() si:
-- [Condición 1]
-- [Condición 2]
+Tabla de routing. El detalle de uso y los prompts recomendados están en `references/skills-detalle.md`.
 
-## Invariantes
-- [Regla que nunca debe romperse]
-
-## Decisiones metodológicas
-- [Decisión]: [justificación]
-
-## Output esperado
-| Archivo | Columnas clave | Filas esperadas |
+| Momento | Skill / acción | Notas |
 |---|---|---|
-| EDA/nombre.csv | col1, col2 | estimado |
-```
+| Configurar repo (1 vez) | `/setup-matt-pocock-skills` | Issue tracker, labels, docs de dominio |
+| Crear PRD padre (1 vez/iniciativa) | `/to-prd` | No usar antes de cada script |
+| Crear spec analítica | `/analytics-spec` o prompt manual | Una por componente crítico |
+| Cuestionar spec | `/grill-with-docs` | Habilita implementación |
+| Crear backlog | `/to-issues` | Solo con equipo / trazabilidad / agentes |
+| Metodología credit scoring | `/credit-scoring` | Solo proyectos crediticios |
+| Interpretación de negocio | `/advanced-analytics` | Traducir métricas a decisiones |
+| Implementar | `ponytail full` | Modo permanente, no se invoca |
+| Funciones reutilizables | `/tdd` | Solo para `mis_funciones.r` |
+| Revisar script | `/code-review` | Después de cada script |
+| Revisar entrega completa | `/code-review ultra` | Una sola vez al final |
+| Refactor final | `/improve-codebase-architecture` | Solo cuando todo funciona |
+| Grafo del codebase | `/graphify` | ≥ 3 scripts o al retomar |
+| Cerrar sesión | `/handoff "próximo objetivo"` | Toda sesión larga cierra con handoff |
 
 ---
 
-## Flujo completo por etapa
+## Interpretabilidad
 
-```
-1. /to-prd
-   → describís la etapa en lenguaje natural
-   → Claude genera spec borrador
+Todo resultado técnico debe tener traducción de negocio. Usar `/advanced-analytics` cuando haga falta.
 
-2. /grill-with-docs
-   → Claude lee la spec y CONTEXT.md
-   → hace preguntas críticas una por una
-   → vos respondés
-   → CONTEXT.md se actualiza con cada decisión
+No alcanza con `AUC = 0.72`. Debe decirse:
 
-3. Commit de la spec
-   → git commit -m "spec: 0N_nombre"
+> El modelo tiene capacidad razonable de ordenar clientes por riesgo. Es útil para priorización y estrategia, pero no debería interpretarse como predicción exacta individual.
 
-4. Implementación
-   → Claude escribe el script siguiendo la spec
-   → el script corre sin errores desde cero
-   → outputs en EDA/ o datos/processed/
+No alcanza con `PSI = 0.31`. Debe decirse:
 
-5. /code-review (opcional por etapa)
-   → revisa el script antes de avanzar a la siguiente etapa
-
-   Al finalizar el pipeline completo (una sola vez):
-   → /code-review ultra   ← revisión profunda multi-agente antes de entregar al cliente
-
-6. Commit del script
-   → git commit -m "feat: script 0N_nombre — descripción breve"
-
-7. /handoff (al cerrar la sesión)
-   → compacta la conversación en un documento de transferencia
-   → la próxima sesión lo lee para retomar sin perder contexto
-   → útil también para pasar trabajo a otro miembro del equipo
-   → /handoff "próximo objetivo" para orientar la transferencia
-```
-
----
-
-## `00_config.r` — contenido mínimo
-
-```r
-# paths
-PATH_RAW       <- "datos/raw/archivo.csv"
-PATH_PROCESSED <- "datos/processed/"
-PATH_EDA       <- "EDA/"
-PATH_MODELOS   <- "modelos/"
-
-# reproducibilidad
-set.seed(42)
-
-# definición de target (si aplica)
-TARGET         <- "nombre_variable_target"
-DEF_TARGET     <- "descripción de qué significa el evento positivo"
-
-# umbrales de calidad (ajustar por proyecto)
-MISSING_MAX    <- 0.80
-AUC_MIN        <- 0.60
-
-# variables categóricas y a descartar
-VARS_CAT       <- c()
-VARS_DESCARTAR <- c()
-
-# parámetros de lectura
-CSV_SEP <- ";"
-CSV_DEC <- "."
-```
-
-**Regla:** todo parámetro que puede cambiar entre proyectos vive aquí. Los scripts no tienen valores hardcodeados.
-
----
-
-## Interpretaciones automáticas vía Claude API
-
-El script de informe puede llamar a Claude directamente para generar narrativa analítica
-con los números reales de cada corrida, en lugar de textos hardcodeados.
-
-### Función `llamar_claude()` en `mis_funciones.r`
-
-```r
-llamar_claude <- function(prompt, max_tokens = 400) {
-  api_key <- Sys.getenv("ANTHROPIC_API_KEY")
-  if (!nzchar(api_key)) {
-    warning("ANTHROPIC_API_KEY no configurada — saltando interpretación automática")
-    return("")
-  }
-  tryCatch({
-    resp <- httr2::request("https://api.anthropic.com/v1/messages") |>
-      httr2::req_headers(
-        "x-api-key"         = api_key,
-        "anthropic-version" = "2023-06-01",
-        "content-type"      = "application/json"
-      ) |>
-      httr2::req_body_json(list(
-        model      = "claude-haiku-4-5-20251001",
-        max_tokens = max_tokens,
-        messages   = list(list(role = "user", content = prompt))
-      )) |>
-      httr2::req_perform() |>
-      httr2::resp_body_json()
-    resp$content[[1]]$text
-  }, error = function(e) {
-    warning("Error llamando a Claude API: ", e$message)
-    ""
-  })
-}
-```
-
-### Secciones típicas a generar automáticamente en el informe
-
-| Sección | Qué interpreta Claude |
-|---|---|
-| Performance | Métricas del modelo en función de variables reales y bad rate |
-| Calibración | Si el modelo está bien calibrado y dónde hay mayor desvío |
-| Estabilidad | PSI e implicancias para producción |
-| Recomendaciones | Cutoffs, mejoras y monitoreo con números reales |
-
-### Configuración
-
-Agregar en `~/.Renviron` (carga automáticamente en toda sesión R):
-```
-ANTHROPIC_API_KEY=sk-ant-...
-```
-
-La función devuelve `""` si no hay API key, **sin romper el pipeline**.
-
----
-
-## Quality Gates: patrón estándar
-
-```r
-# al inicio de cada script
-stopifnot(
-  "archivo input ausente" = file.exists(PATH_INPUT),
-  "target ausente"        = TARGET %in% names(datos)
-)
-
-# validaciones de negocio
-if (alguna_condicion_critica)
-  stop("Quality Gate: descripción del problema")
-```
-
-**Regla:** el script debe fallar ruidosamente si algo está mal. Un script que termina sin error pero con datos incorrectos es peor que uno que falla.
-
----
-
-## Reproducibilidad: renv
-
-`set.seed()` garantiza reproducibilidad del muestreo pero no protege contra cambios de API de paquetes. `renv` fija las versiones exactas.
-
-```r
-install.packages("renv")
-renv::init()        # al arrancar el proyecto
-# ... instalar paquetes normalmente ...
-renv::snapshot()    # después de cada cambio en dependencias
-# al clonar / retomar:
-renv::restore()
-```
-
-**Qué se commitea:** `renv.lock` sí. La carpeta `renv/library/` no (va a `.gitignore`).
-
-Registrar la versión de R en `CONTEXT.md` (ej: R 4.5.1).
-
----
-
-## CLAUDE.md — contenido mínimo por proyecto
-
-```markdown
-# CLAUDE.md — nombre_proyecto
-
-## Contexto
-[Una oración describiendo el proyecto. Ver CONTEXT.md para detalle.]
-
-## Lenguaje
-[R / Python / SQL + R / etc.]
-
-## Metodología
-SDD + Ponytail. Cada etapa tiene su spec en specs/. Arrancar siempre por la spec.
-
-## Estructura de specs
-- specs/01_... → [qué hace]
-- specs/02_... → [qué hace]
-
-## Ponytail
-Activo (full). No construir abstracciones no pedidas.
-
-## Agent skills
-- Issue tracker: [GitHub Issues / local markdown]
-- Context files: CONTEXT.md (dominio), specs/*.md (tareas activas)
-
-## Cierre de sesión
-Antes de cerrar, correr `/handoff "descripción de lo que sigue"`.
-```
-
----
-
-## Versionado de modelos
-
-Sin MLflow. Git + carpetas versionadas:
-
-```
-modelos/
-  v1/
-    modelo_final.rds
-    metadata_modelo.rds
-    CHANGELOG.md      ← fecha, variables, métricas clave, motivo del cambio
-  v2/
-    ...
-```
-
-`CHANGELOG.md` mínimo:
-```markdown
-# v1 — AAAA-MM-DD
-- Variables: [lista]
-- AUC test: 0.XXX | Gini: XX% | KS: XX%
-- Motivo: modelo baseline inicial
-```
-
----
-
-## Governance: `model_registry.csv`
-
-Un registro por modelo productivo:
-
-```
-model_name | version | build_date | developer | target_definition |
-population | variables_finales | auc_train | auc_test | gini_test |
-ks_test | deployment_date | status
-```
-
-`status`: `desarrollo` → `validación` → `producción` → `deprecado`.
-
----
-
-## Definición de target y ventanas (para modelos predictivos)
-
-Antes de modelar, documentar en `CONTEXT.md`:
-
-| Decisión | Qué definir |
-|---|---|
-| Definición del evento | Qué condición define el positivo (ej: mora ≥ 30d, churn en 90d) |
-| Ventana de observación | Fecha/período en que se "fotografía" al cliente (las variables) |
-| Ventana de performance | Período posterior en que se observa el evento |
-| Población elegible | Quién entra y quién se excluye, con motivo explícito |
-| Indeterminados | Casos ambiguos: ¿se excluyen o se asignan? |
-
-**Invariante crítico:** ninguna variable puede contener información posterior a la ventana de observación. Si una variable "ve el futuro", es leakage y el modelo no sirve en producción aunque el AUC sea alto.
+> La población actual difiere materialmente de la población de desarrollo. Antes de usar el modelo para decisiones automáticas, se recomienda revisar drift por variable y performance reciente.
 
 ---
 
 ## Checklist de entrega
 
-- [ ] `00_run_pipeline.r` corre de punta a punta sin intervención manual
-- [ ] Todos los quality gates pasan
-- [ ] `CONTEXT.md` refleja todas las decisiones tomadas
-- [ ] `governance/model_registry.csv` actualizado
-- [ ] `/code-review ultra` ejecutado y hallazgos resueltos
-- [ ] Informe HTML generado y revisado
-- [ ] Commit final con tag: `git tag v1.0`
+* [ ] PRD padre creado o documentado
+* [ ] Specs críticas creadas y grilladas
+* [ ] No quedan preguntas bloqueantes
+* [ ] `00_run_pipeline.r` corre de punta a punta
+* [ ] Todos los quality gates pasan
+* [ ] `CONTEXT.md` contiene solo decisiones estables del dominio
+* [ ] Cada spec contiene sus decisiones específicas
+* [ ] ADRs creados para decisiones arquitectónicas duraderas
+* [ ] `renv.lock` actualizado si aplica
+* [ ] `governance/model_registry.csv` y `modelos/vN/CHANGELOG.md` actualizados si hay modelo
+* [ ] Informe generado y revisado (narrativa automática revisada si se usó Claude API)
+* [ ] `/code-review ultra` ejecutado y hallazgos críticos resueltos
+* [ ] Commit final y tag de versión si corresponde (`git tag v1.0`)
 
 ---
 
@@ -414,54 +216,57 @@ Antes de modelar, documentar en `CONTEXT.md`:
 
 | Error | Corrección |
 |---|---|
-| Escribir código antes de tener la spec | Siempre spec primero |
-| Calcular features sobre toda la población antes de splitear | Split primero, features solo en train |
-| Breaks de bins que generan NAs en test | Usar `-Inf`/`Inf` en extremos de los breaks |
-| Hardcodear parámetros en los scripts | Todo en `00_config.r` |
-| Scripts que fallan silenciosamente | Quality gates con `stop()` explícito |
-| Documentar el "qué" en lugar del "por qué" | CONTEXT.md es para decisiones, no para describir el código |
-| Correr `/improve-codebase-architecture` en el medio del desarrollo | Solo al final |
-| Mezclar cohortes sin analizar vintage | Analizar bad rate por cohorte antes de modelar |
+| Usar `/to-prd` para cada script | `/to-prd` crea el PRD padre. Las etapas usan specs. |
+| Escribir código antes de tener spec | Crear spec, grillarla y recién después implementar. |
+| Mandar todas las decisiones a `CONTEXT.md` | Clasificar: contexto, spec, ADR o issue. |
+| Mezclar PRD con spec | PRD define qué y por qué. Spec define cómo. |
+| Calcular target sin fecha de corte clara | Definir observación, performance y población elegible. |
+| Aprender bins/imputaciones con train + test | Fit en train, apply en test/OOT/producción. |
+| Variables con información futura | Eliminar; es leakage. |
+| Hardcodear parámetros en scripts | Pasar a `00_config.r`. |
+| Scripts que fallan silenciosamente | Quality gates con `stop()`. |
+| Reportar métricas sin interpretación | Traducir siempre a implicancias de negocio. |
+| Refactorizar antes de que funcione | Ponytail: primero mínimo código correcto. |
+| Usar `/improve-codebase-architecture` en el medio | Solo al final. |
+| Mezclar cohortes sin vintage analysis | Analizar métricas por cohorte/vintage cuando aplique. |
+| Crear issues demasiado grandes | Dividir por tarea ejecutable y acceptance criteria. |
+| Llamar a Claude API con datos sensibles innecesarios | Enviar métricas agregadas y revisar narrativa. |
+| Confiar en paquetes sin versionar | Usar `renv` si el proyecto debe reproducirse. |
 
 ---
 
-## Inicio rápido en un proyecto nuevo
+## Inicio rápido en proyecto nuevo
 
 ```bash
-# 1. crear carpeta y git
 mkdir nombre_proyecto && cd nombre_proyecto && git init
 
-# 2. estructura
-mkdir -p specs scripts datos/raw datos/processed EDA modelos/v1 \
-         reportes governance graficos logs
-
-# 3. copiar datos a datos/raw/ (nunca modificar)
-
-# 4. en Claude Code:
-#    - declarar ponytail activo
-#    - /setup-matt-pocock-skills
-#    - crear CLAUDE.md y CONTEXT.md
-#    - crear scripts/00_config.r
-
-# 5. por cada etapa: /to-prd → /grill-with-docs → código → /code-review → commit
-
-# 6. al finalizar: /code-review ultra → /improve-codebase-architecture → /graphify
+mkdir -p docs/agents docs/adr specs scripts datos/raw datos/processed \
+         EDA modelos/v1 reportes governance graficos logs
 ```
+
+En Claude Code:
+
+```text
+Trabajemos con ponytail full activo.
+
+/setup-matt-pocock-skills
+
+Crear CLAUDE.md, CONTEXT.md y scripts/00_config.r para este proyecto.
+Luego /to-prd para crear el PRD padre.
+```
+
+Después: crear specs hijas según el tipo de proyecto (ver `references/specs-por-tipo.md`), grillarlas una por una, implementar scripts, correr pipeline, code review.
 
 ---
 
-## Referencia rápida de skills por momento
+## Principio final
 
-| Momento | Skills |
-|---|---|
-| Inicio del proyecto | `/setup-matt-pocock-skills` |
-| Antes de cada etapa | `/to-prd` |
-| Después de la spec | `/grill-with-docs` |
-| Al modelizar | `/credit-scoring` + `/advanced-analytics` |
-| Después de cada script | `/code-review` |
-| Proyecto con equipo | `/to-issues` |
-| Pipeline completo | `/code-review ultra` → `/improve-codebase-architecture` → `/graphify` |
-| Cerrar sesión / transferir trabajo | `/handoff` o `/handoff "próximo objetivo"` |
-| Retomar proyecto pausado | `graphify query "<pregunta>"` |
-| Funciones reutilizables | `/tdd` |
-| Modo de trabajo permanente | `ponytail full` |
+El workflow correcto no es `idea → código → arreglar documentación`. Es:
+
+```text
+idea → PRD → specs → grill → issues (opcional) → código → validación → informe → monitoreo
+```
+
+* Si una decisión no está documentada, no existe.
+* Si el pipeline no corre de punta a punta, no está terminado.
+* Si el resultado no puede explicarse a negocio, no está listo para entregar.
