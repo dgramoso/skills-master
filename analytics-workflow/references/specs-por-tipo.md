@@ -4,6 +4,8 @@
 
 Cada spec listada acá debe crearse con el template general y grillarse con `/grill-with-docs` antes de escribir código.
 
+Estas son las specs **por defecto**. Los módulos avanzados (reject inference, validación independiente, fairness, data governance) son **opcionales** y se activan solo si el cliente o el regulador lo exige — ver `modulos-opcionales.md`.
+
 ---
 
 ## A. Modelo supervisado
@@ -81,6 +83,8 @@ Debe definir:
 * selección de modelo
 * interpretación
 * umbrales mínimos
+
+> **Opcional — reject inference (originación):** si el modelo es de originación y hay población rechazada significativa, definir si se aplica reject inference y con qué método (reclasificación / parcelling / augmentation / Heckman), y marcarlo explícito en la spec (`reject inference: sí/no + método`). Ver `modulos-opcionales.md`.
 
 ### 05_deployment_scoring.md
 

@@ -31,6 +31,7 @@ Este `SKILL.md` es el núcleo navegable. El detalle operativo vive en archivos a
 | `00_config.r`, `00_run_pipeline.r`, renv | `references/reproducibilidad.md` |
 | Versionado de modelos, CHANGELOG, `model_registry.csv` | `references/governance.md` |
 | Narrativa automática vía Claude API (`llamar_claude()`) | `references/claude-api.md` |
+| Módulos avanzados **opcionales** (reject inference, validación independiente, fairness, data governance) — activar solo si el cliente/regulador lo exige | `references/modulos-opcionales.md` |
 | Plantillas copiables | `templates/00_config.r`, `templates/CLAUDE.md.tmpl`, `templates/CHANGELOG.md.tmpl` |
 
 ---
