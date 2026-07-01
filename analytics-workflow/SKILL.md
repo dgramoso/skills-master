@@ -20,7 +20,7 @@ Metodología para proyectos de analítica con Claude Code: credit scoring, cobra
 
 ## Archivos de referencia
 
-Este `SKILL.md` es el núcleo navegable. El detalle operativo vive en archivos que se cargan cuando hacen falta:
+Este `SKILL.md` es el núcleo navegable. El detalle operativo vive en archivos aparte. **Cuando la tarea entre en uno de los casos de abajo, leé el archivo correspondiente con Read antes de responder** — no trabajes de memoria ni improvises lo que ya está documentado.
 
 | Cuándo lo necesitás | Archivo |
 |---|---|
