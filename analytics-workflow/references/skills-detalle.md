@@ -186,9 +186,9 @@ Un agente puede tomarlo sin pedir contexto humano adicional.
 
 ---
 
-## `/credit-scoring`
+## `/metodologia-credit-scoring`
 
-Invocar si el proyecto es credit scoring o riesgo crediticio. Debe guiar:
+Invocar si el proyecto es credit scoring o riesgo crediticio (la guía técnica Siddiqi vive embebida en su `references/credit-scoring.md`). Debe guiar:
 
 * definición de bueno/malo
 * WOE/IV

@@ -1,6 +1,6 @@
 ---
 name: advanced-analytics
-description: Ejecución técnica e interpretación de negocio para proyectos de analítica avanzada a estándar de consultora internacional (McKinsey/EY/Experian). Cubre EDA guiado por hipótesis, segmentación, scoring, regresión, clasificación, clustering, forecasting, driver analysis, traducción de métricas (AUC, KS, PSI, R², MAPE) a decisiones, so-what cuantificado y QA analítico. Usar para analizar datasets (CSV, SQL, Excel), construir modelos, identificar drivers o convertir hallazgos técnicos en recomendaciones ejecutivas. Complementa a analytics-workflow (proceso SDD) y credit-scoring (metodología crediticia).
+description: Ejecución técnica e interpretación de negocio para proyectos de analítica avanzada a estándar de consultora internacional (McKinsey/EY/Experian). Cubre EDA guiado por hipótesis, segmentación, scoring, regresión, clasificación, clustering, forecasting, driver analysis, traducción de métricas (AUC, KS, PSI, R², MAPE) a decisiones, so-what cuantificado y QA analítico. Usar para analizar datasets (CSV, SQL, Excel), construir modelos, identificar drivers o convertir hallazgos técnicos en recomendaciones ejecutivas. Complementa a analytics-workflow (proceso SDD) y metodologia-credit-scoring (metodología crediticia).
 ---
 
 # Advanced Analytics — Ejecución e Interpretación
@@ -16,7 +16,7 @@ Esta skill define **cómo se hace y cómo se interpreta un análisis**. No defin
 | Proceso del proyecto: PRD, specs, grill, estados, engagement, entrega, handover | `analytics-workflow` (SKILL.md + `references/`) |
 | Estándar del informe ejecutivo: pyramid principle, piezas del entregable | `analytics-workflow/references/informe-ejecutivo.md` |
 | QA pre-entrega del proyecto completo y quality gates de pipeline | `analytics-workflow/references/quality-gates.md` |
-| Metodología crediticia completa (WOE/IV, scorecard, OOT, strategy tables) | `credit-scoring` |
+| Metodología crediticia completa (WOE/IV, scorecard, OOT, strategy tables) | `metodologia-credit-scoring` (+ su `references/credit-scoring.md`) |
 | Funciones ya testeadas (PSI, KS, AUC/Gini, lift, WOE/IV fit-apply) | `analytics-workflow/templates/mis_funciones.r` · `utils.py` |
 | Diseño de gráficos y dashboards | skill `dataviz` |
 
@@ -84,7 +84,7 @@ Elegir el modelo más simple que responde la pregunta. Por tipo:
 | Clasificación | Prevalencia / regla actual del cliente | AUC, KS, precision/recall, lift por decil, calibración, trade-offs de umbral |
 | Clustering | Segmentación vigente del negocio | Tamaño y perfil de cada cluster en variables de negocio, estabilidad |
 | Series de tiempo | Naive estacional | MAPE/sMAPE por horizonte, comparación vs naive |
-| Credit scoring | Regla vigente / score anterior | Derivar a la skill `credit-scoring` |
+| Credit scoring | Regla vigente / score anterior | Derivar a la skill `metodologia-credit-scoring` |
 
 - Reportar siempre la comparación contra baseline y el veredicto: ¿la complejidad extra mejora la decisión lo suficiente?
 - **Disparadores de sospecha** (auditar antes de reportar): AUC > 0.90 en datos de comportamiento, R² > 0.95 en datos de negocio, una feature con > 50% de la importancia total, performance en test mejor que en train.

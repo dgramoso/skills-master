@@ -186,7 +186,7 @@ Tabla de routing. El detalle de uso y los prompts recomendados están en `refere
 | Crear spec analítica | `/analytics-spec` (si existe) o prompt manual | Una por componente crítico |
 | Cuestionar spec | `/grill-with-docs` | Habilita implementación |
 | Crear backlog | `/to-issues` | Solo con equipo / trazabilidad / agentes |
-| Metodología credit scoring | `/credit-scoring` | Solo proyectos crediticios |
+| Metodología credit scoring | `/metodologia-credit-scoring` | Solo proyectos crediticios |
 | Interpretación de negocio | `/advanced-analytics` | Traducir métricas a decisiones |
 | Implementar | `ponytail full` | Modo permanente, no se invoca |
 | Funciones reutilizables | `/tdd` | Arrancar de la biblioteca semilla (`templates/mis_funciones.r` / `utils.py`, ya testeada); `/tdd` solo para funciones nuevas |
