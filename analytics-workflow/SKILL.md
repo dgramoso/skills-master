@@ -35,6 +35,7 @@ Este `SKILL.md` es el núcleo navegable. El detalle operativo vive en archivos a
 | Estándar de informe ejecutivo: pyramid principle, so-what, visualización, piezas del entregable | `references/informe-ejecutivo.md` |
 | Módulos avanzados **opcionales** (reject inference, validación formal + MDD, fairness, data governance) — activar solo si el cliente/regulador lo exige | `references/modulos-opcionales.md` |
 | Plantillas copiables | `templates/00_config.r` (R), `templates/00_config.py` (Python), `templates/CLAUDE.md.tmpl`, `templates/CHANGELOG.md.tmpl`, y artefactos de engagement/entrega: `decision_log`, `minuta`, `status_report`, `informe_ejecutivo`, `qa_pre_entrega`, `acta_cierre` (`.md.tmpl`) |
+| Biblioteca semilla de funciones **testeada** (PSI, KS, AUC/Gini, lift/gain, strategy table, winsorización fit/apply, WOE/IV fit/apply, validación de porcentajes) | `templates/mis_funciones.r` + `templates/test_mis_funciones.r` (R) · `templates/utils.py` + `templates/test_utils.py` (Python) |
 
 ---
 
@@ -188,7 +189,7 @@ Tabla de routing. El detalle de uso y los prompts recomendados están en `refere
 | Metodología credit scoring | `/credit-scoring` | Solo proyectos crediticios |
 | Interpretación de negocio | `/advanced-analytics` | Traducir métricas a decisiones |
 | Implementar | `ponytail full` | Modo permanente, no se invoca |
-| Funciones reutilizables | `/tdd` | Solo para `mis_funciones.r` |
+| Funciones reutilizables | `/tdd` | Arrancar de la biblioteca semilla (`templates/mis_funciones.r` / `utils.py`, ya testeada); `/tdd` solo para funciones nuevas |
 | Revisar script | `/code-review` | Después de cada script |
 | Revisar entrega completa | `/code-review ultra` | Una sola vez al final |
 | Refactor final | `/improve-codebase-architecture` | Solo cuando todo funciona |
