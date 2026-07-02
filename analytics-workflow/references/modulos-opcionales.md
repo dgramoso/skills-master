@@ -35,7 +35,7 @@ la decisión (qué se activa y por qué) en el PRD. Si ninguna aplica, el flujo 
   comportamiento de los rechazados (through-the-door population).
 * **Activar si:** originación / acquisition + población rechazada relevante.
 * **NO hace falta si:** modelo comportamental, cartera existente, o población completa observada.
-* **Qué agrega:** en `04_modeling_validation.md`, definir método (reclasificación / parcelling /
+* **Qué agrega:** en `05_modeling_validation.md`, definir método (reclasificación / parcelling /
   augmentation / Heckman) y su validación. Marcar explícito: `reject inference: sí/no + método`.
 * **Esfuerzo:** bajo-medio (una sección en la spec de modeling; sin etapa nueva).
 
@@ -46,9 +46,10 @@ la decisión (qué se activa y por qué) en el PRD. Si ninguna aplica, el flujo 
 * **Activar si:** cliente regulado, modelo material, o exige documentación auditable.
 * **NO hace falta si:** uso interno, exploratorio, o cliente que solo quiere el resultado de negocio.
 * **Qué agrega:** spec `0N_model_validation.md` + Validation Report + MDD (separados del informe de negocio).
-* **Regla:** la validación la hace alguien —o un pase— **distinto** del desarrollo (effective
-  challenge, no autovalidación). Solo/chico: un pase disciplinado con sombrero de validador +
-  `/code-review ultra` reencuadrado como challenge.
+* **Frontera con el default:** el QA pre-entrega (`quality-gates.md`) es obligatorio en todo
+  proyecto y ya cubre el pase disciplinado con sombrero de validador + `/code-review ultra`.
+  Este módulo agrega encima la validación **formal**: Validation Report + MDD + effective
+  challenge documentado por alguien (o un pase) distinto del desarrollo — no autovalidación.
 * **Esfuerzo:** alto.
 
 ### 3. Fairness + adverse action / reason codes

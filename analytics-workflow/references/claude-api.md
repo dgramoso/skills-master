@@ -4,6 +4,8 @@
 
 El script de informe puede llamar a Claude directamente para generar narrativa analítica con los números reales de cada corrida, en lugar de usar textos hardcodeados.
 
+> El ejemplo de abajo está en R (`httr2`). En Python el equivalente es el SDK oficial `anthropic` (`Anthropic().messages.create(...)`) o `requests` contra el mismo endpoint. La lógica es idéntica: devolver `""` si no hay API key y no romper el pipeline.
+
 ## Función `llamar_claude()` en `mis_funciones.r`
 
 ```r
@@ -62,6 +64,7 @@ La función devuelve `""` si no hay API key, sin romper el pipeline.
 
 Reglas:
 
+* El uso de la API con información del cliente debe estar habilitado por la política de datos acordada en el intake (ver `references/engagement.md`). Si el contrato prohíbe enviar datos a terceros, desactivar la narrativa automática.
 * No enviar datos personales innecesarios.
 * No enviar información sensible si no es imprescindible.
 * Preferir prompts con métricas agregadas, no datasets completos.

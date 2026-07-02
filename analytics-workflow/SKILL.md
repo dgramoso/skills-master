@@ -31,8 +31,10 @@ Este `SKILL.md` es el núcleo navegable. El detalle operativo vive en archivos a
 | `00_config.r`, `00_run_pipeline.r`, renv | `references/reproducibilidad.md` |
 | Versionado de modelos, CHANGELOG, `model_registry.csv` | `references/governance.md` |
 | Narrativa automática vía Claude API (`llamar_claude()`) | `references/claude-api.md` |
-| Módulos avanzados **opcionales** (reject inference, validación independiente, fairness, data governance) — activar solo si el cliente/regulador lo exige | `references/modulos-opcionales.md` |
-| Plantillas copiables | `templates/00_config.r`, `templates/CLAUDE.md.tmpl`, `templates/CHANGELOG.md.tmpl` |
+| Gestión del engagement: intake, decision log, minutas, status, change request, cierre/handover, política de datos | `references/engagement.md` |
+| Estándar de informe ejecutivo: pyramid principle, so-what, visualización, piezas del entregable | `references/informe-ejecutivo.md` |
+| Módulos avanzados **opcionales** (reject inference, validación formal + MDD, fairness, data governance) — activar solo si el cliente/regulador lo exige | `references/modulos-opcionales.md` |
+| Plantillas copiables | `templates/00_config.r` (R), `templates/00_config.py` (Python), `templates/CLAUDE.md.tmpl`, `templates/CHANGELOG.md.tmpl`, y artefactos de engagement/entrega: `decision_log`, `minuta`, `status_report`, `informe_ejecutivo`, `qa_pre_entrega`, `acta_cierre` (`.md.tmpl`) |
 
 ---
 
@@ -63,6 +65,7 @@ Cinco niveles con roles distintos:
 - **Issues** — unidades ejecutables derivadas de specs aprobadas. Opcionales: solo con equipo, backlog visible, ejecución por agentes o trazabilidad con cliente.
 - **CONTEXT.md** — memoria estable del dominio: glosario, reglas de negocio persistentes, definiciones reutilizables, convenciones. No es basurero de decisiones transitorias.
 - **ADRs** (`docs/adr/`) — decisiones arquitectónicas duraderas. Ej: batch vs real-time, scorecard interpretable vs black-box, Git + `modelos/vN/` como registry liviano.
+- **Decision log** (`engagement/decision_log.md`) — registro **cliente-facing** de toda decisión aprobada por el cliente, con fecha. Complementa a los documentos internos; protege el alcance. Ver `references/engagement.md`.
 
 ### Persistencia de decisiones
 
@@ -75,6 +78,7 @@ Durante `/grill-with-docs`, clasificar cada respuesta del analista **antes** de 
 | Decisión arquitectónica duradera | `docs/adr/` | "El scoring será batch diario y no real-time." |
 | Trabajo ejecutable | Issue tracker | "Implementar cálculo mensual de PSI." |
 | Hallazgo exploratorio | `EDA/` o informe técnico | "La variable X tiene 42% de missing." |
+| Decisión aprobada por el cliente | `engagement/decision_log.md` (además del destino interno) | "Cliente aprobó horizonte de 90 días (2026-07-15)." |
 
 Regla: **CONTEXT.md no es un basurero de decisiones.** Solo contiene conocimiento reutilizable por futuras features y agentes.
 
@@ -105,6 +109,7 @@ nombre_proyecto/
 │
 ├── reportes/
 ├── governance/            # model_registry.csv
+├── engagement/            # intake.md, decision_log.md, minutas/, status/, acta_cierre.md
 ├── graficos/
 └── logs/
 ```
@@ -113,8 +118,10 @@ Reglas:
 
 * `datos/raw/` es inmutable. Nunca sobrescribir datos originales.
 * Todo output reproducible va a `datos/processed/`, `EDA/`, `modelos/`, `reportes/`, `graficos/` o `logs/`.
-* Todo parámetro que puede cambiar entre proyectos vive en `scripts/00_config.r`.
+* Todo parámetro que puede cambiar entre proyectos vive en `scripts/00_config.r` (o `00_config.py`).
 * Ningún script depende de pasos manuales invisibles.
+
+> **Nombres por lenguaje.** Los nombres de archivo de esta skill están en R (`00_config.r`, `mis_funciones.r`, `.rds`); en Python usar los equivalentes `.py` (`00_config.py`, `utils.py`, `.parquet`/`.pkl`). La metodología es idéntica — ver la sección "Equivalentes en Python" en `references/reproducibilidad.md`.
 
 ---
 
@@ -123,21 +130,30 @@ Reglas:
 Cada proyecto avanza por estados. No saltar un estado salvo decisión explícita documentada.
 
 ```text
-intake → prd_created → specs_generated → specs_grilled
+kickoff → prd_created → specs_generated → specs_grilled
   → issues_created (opcional) → implementation → validation
-  → report → delivery → monitoring
+  → qa_delivery → report → delivery → handover
 ```
+
+Dentro de `implementation`, el orden interno es: **datos → EDA → features → modelo**.
 
 | Transición | Condición para avanzar |
 |---|---|
-| `intake` → `prd_created` | PRD documentado y alcance aprobado |
+| `kickoff` → `prd_created` | Intake completo (`engagement/intake.md`: sponsor, pregunta de negocio, viabilidad de datos, política de datos, expectativas calibradas) y PRD aprobado por el cliente |
 | `prd_created` → `specs_generated` | Specs hijas identificadas y creadas |
 | `specs_generated` → `specs_grilled` | Cada spec crítica cuestionada con `/grill-with-docs` |
 | `specs_grilled` → `implementation` | No quedan preguntas bloqueantes |
 | `implementation` → `validation` | Pipeline corre punta a punta |
-| `validation` → `report` | Quality gates y métricas mínimas pasan |
-| `report` → `delivery` | Informe revisado, reproducible y entendible |
-| `delivery` → `monitoring` | Registry, changelog y monitoreo definidos |
+| `validation` → `qa_delivery` | Quality gates y métricas mínimas pasan; el modelo supera al baseline |
+| `qa_delivery` → `report` | Checklist de QA pre-entrega completo (ver `references/quality-gates.md`) |
+| `report` → `delivery` | Informe cumple `references/informe-ejecutivo.md`: exec summary autocontenido, so-what cuantificado, cifras consistentes |
+| `delivery` → `handover` | Acta de cierre, monitoreo asignado (cliente o consultor), decision log entregado, registry y changelog al día |
+
+### EDA — exploración entre datos y features
+
+El EDA es una **etapa de primera clase**: tiene su propia spec (`03_eda.md`), se grilla con `/grill-with-docs` y sigue el mismo flujo por etapa que el resto (spec → grill → commit → implementar → correr → verificar quality gates → code-review → commit). Su spec define qué preguntas debe responder, qué outputs produce en `EDA/` y sus quality gates verificables.
+
+Ubicación en el pipeline: **después** del data snapshot y **antes** de feature engineering. Sus hallazgos (distribuciones, missing, outliers, correlaciones, señales tempranas de leakage) informan la spec de features, que puede refinarse a partir de ellos. Los hallazgos estables del dominio se registran en `CONTEXT.md`; los específicos de esta iteración, en la spec correspondiente.
 
 ---
 
@@ -154,7 +170,7 @@ intake → prd_created → specs_generated → specs_grilled
 8. Commit de script               → git commit -m "feat: script 0N_nombre — descripción"
 ```
 
-Al terminar el pipeline completo, una sola vez: `/code-review ultra` → informe → delivery → monitoring.
+Al terminar el pipeline completo, una sola vez: QA pre-entrega (`references/quality-gates.md`) + `/code-review ultra` → informe → delivery → handover.
 
 ---
 
@@ -166,7 +182,7 @@ Tabla de routing. El detalle de uso y los prompts recomendados están en `refere
 |---|---|---|
 | Configurar repo (1 vez) | `/setup-matt-pocock-skills` | Issue tracker, labels, docs de dominio |
 | Crear PRD padre (1 vez/iniciativa) | `/to-prd` | No usar antes de cada script |
-| Crear spec analítica | `/analytics-spec` o prompt manual | Una por componente crítico |
+| Crear spec analítica | `/analytics-spec` (si existe) o prompt manual | Una por componente crítico |
 | Cuestionar spec | `/grill-with-docs` | Habilita implementación |
 | Crear backlog | `/to-issues` | Solo con equipo / trazabilidad / agentes |
 | Metodología credit scoring | `/credit-scoring` | Solo proyectos crediticios |
@@ -181,9 +197,17 @@ Tabla de routing. El detalle de uso y los prompts recomendados están en `refere
 
 ---
 
-## Interpretabilidad
+## Interpretabilidad y so-what
 
 Todo resultado técnico debe tener traducción de negocio. Usar `/advanced-analytics` cuando haga falta.
+
+En el informe final, el estándar es más exigente (detalle en `references/informe-ejecutivo.md`): ningún hallazgo se reporta suelto —
+
+```text
+hallazgo → implicancia → recomendación → impacto estimado → esfuerzo/owner
+```
+
+El impacto se cuantifica en plata o volumen cuando los datos lo permiten; si no, se dice explícito por qué no.
 
 No alcanza con `AUC = 0.72`. Debe decirse:
 
@@ -197,18 +221,23 @@ No alcanza con `PSI = 0.31`. Debe decirse:
 
 ## Checklist de entrega
 
+* [ ] Intake completo (`engagement/intake.md`) y decision log al día — toda aprobación del cliente con fecha
 * [ ] PRD padre creado o documentado
 * [ ] Specs críticas creadas y grilladas
 * [ ] No quedan preguntas bloqueantes
+* [ ] Spec de EDA (`03_eda.md`) creada, grillada y ejecutada; hallazgos en `EDA/` antes de feature engineering
 * [ ] `00_run_pipeline.r` corre de punta a punta
 * [ ] Todos los quality gates pasan
+* [ ] Modelo comparado contra baseline naive / status quo del cliente — y lo supera
 * [ ] `CONTEXT.md` contiene solo decisiones estables del dominio
 * [ ] Cada spec contiene sus decisiones específicas
 * [ ] ADRs creados para decisiones arquitectónicas duraderas
 * [ ] `renv.lock` actualizado si aplica
 * [ ] `governance/model_registry.csv` y `modelos/vN/CHANGELOG.md` actualizados si hay modelo
-* [ ] Informe generado y revisado (narrativa automática revisada si se usó Claude API)
+* [ ] QA pre-entrega ejecutado: pipeline reproducido en limpio, cifras del informe verificadas contra outputs (`templates/qa_pre_entrega.md.tmpl`)
+* [ ] Informe cumple `references/informe-ejecutivo.md`: responde la pregunta de negocio del PRD, exec summary autocontenido, so-what cuantificado por hallazgo, supuestos/limitaciones/condiciones de uso, cifras consistentes (narrativa automática revisada si se usó Claude API)
 * [ ] `/code-review ultra` ejecutado y hallazgos críticos resueltos
+* [ ] Acta de cierre y handover de monitoreo definidos (quién lo corre, con qué instrucciones)
 * [ ] Commit final y tag de versión si corresponde (`git tag v1.0`)
 
 ---
@@ -233,6 +262,11 @@ No alcanza con `PSI = 0.31`. Debe decirse:
 | Crear issues demasiado grandes | Dividir por tarea ejecutable y acceptance criteria. |
 | Llamar a Claude API con datos sensibles innecesarios | Enviar métricas agregadas y revisar narrativa. |
 | Confiar en paquetes sin versionar | Usar `renv` si el proyecto debe reproducirse. |
+| Entregar sin QA pre-entrega | Reproducir en limpio y verificar cifras antes del informe. |
+| Prometer métricas concretas antes del EDA | Calibrar expectativas recién después del diagnóstico de datos. |
+| Decisión del cliente sin registrar | Toda aprobación va al decision log con fecha. |
+| Reportar performance sin baseline | Comparar siempre contra baseline naive o status quo del cliente. |
+| Título de gráfico que describe en vez de afirmar | Assertion titles: el título es el hallazgo. |
 
 ---
 
@@ -242,7 +276,8 @@ No alcanza con `PSI = 0.31`. Debe decirse:
 mkdir nombre_proyecto && cd nombre_proyecto && git init
 
 mkdir -p docs/agents docs/adr specs scripts datos/raw datos/processed \
-         EDA modelos/v1 reportes governance graficos logs
+         EDA modelos/v1 reportes governance engagement/minutas engagement/status \
+         graficos logs
 ```
 
 En Claude Code:
@@ -253,6 +288,7 @@ Trabajemos con ponytail full activo.
 /setup-matt-pocock-skills
 
 Crear CLAUDE.md, CONTEXT.md y scripts/00_config.r para este proyecto.
+Completar engagement/intake.md con el checklist de references/engagement.md.
 Luego /to-prd para crear el PRD padre.
 ```
 
@@ -265,9 +301,11 @@ Después: crear specs hijas según el tipo de proyecto (ver `references/specs-po
 El workflow correcto no es `idea → código → arreglar documentación`. Es:
 
 ```text
-idea → PRD → specs → grill → issues (opcional) → código → validación → informe → monitoreo
+kickoff → PRD → specs → grill → issues (opcional) → código → validación
+  → QA pre-entrega → informe → entrega → handover
 ```
 
 * Si una decisión no está documentada, no existe.
+* Si el cliente no lo aprobó por escrito, no está aprobado.
 * Si el pipeline no corre de punta a punta, no está terminado.
-* Si el resultado no puede explicarse a negocio, no está listo para entregar.
+* Si el resultado no puede explicarse a negocio —con su so-what cuantificado—, no está listo para entregar.

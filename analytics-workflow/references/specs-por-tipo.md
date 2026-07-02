@@ -6,6 +6,8 @@ Cada spec listada acá debe crearse con el template general y grillarse con `/gr
 
 Estas son las specs **por defecto**. Los módulos avanzados (reject inference, validación independiente, fairness, data governance) son **opcionales** y se activan solo si el cliente o el regulador lo exige — ver `modulos-opcionales.md`.
 
+El estándar de entrega de `informe-ejecutivo.md` (pyramid principle, so-what cuantificado, supuestos/limitaciones, consistencia de cifras) aplica a la spec de report de **los tres tipos** de proyecto.
+
 ---
 
 ## A. Modelo supervisado
@@ -19,11 +21,12 @@ specs/
 ├── 00_prd_reference.md
 ├── 01_target_outcome.md
 ├── 02_data_snapshot.md
-├── 03_feature_engineering.md
-├── 04_modeling_validation.md
-├── 05_deployment_scoring.md
-├── 06_monitoring.md
-└── 07_report.md
+├── 03_eda.md
+├── 04_feature_engineering.md
+├── 05_modeling_validation.md
+├── 06_deployment_scoring.md
+├── 07_monitoring.md
+└── 08_report.md
 ```
 
 ### 01_target_outcome.md
@@ -56,7 +59,25 @@ Debe definir:
 * controles de integridad
 * outputs intermedios
 
-### 03_feature_engineering.md
+### 03_eda.md
+
+Debe definir:
+
+* preguntas / hipótesis que el EDA debe responder
+* universo de variables a perfilar (todas o subconjunto)
+* análisis de distribuciones (numéricas y categóricas)
+* análisis de missing (patrón y % por variable)
+* detección de outliers y valores imposibles
+* correlaciones y multicolinealidad preliminar
+* relación de cada variable con el target (tasa de evento por bin, IV/estadístico preliminar)
+* candidatos tempranos a leakage (señal sospechosamente alta)
+* outputs esperados en `EDA/` (tablas y gráficos)
+* **diagnóstico de calidad de datos compartible con el cliente**: cobertura, missing, consistencia, período útil y veredicto de viabilidad del alcance. Se entrega temprano — genera confianza, protege ("los datos tenían 40% de missing y lo dijimos a tiempo") y detecta proyectos inviables antes de quemar horas
+* quality gates (ej.: todas las variables del universo perfiladas, reporte de missing generado, candidatos a leakage listados)
+
+> El EDA informa `04_feature_engineering`: esa spec puede refinarse a partir de los hallazgos. Aprender bins/imputaciones acá es solo exploratorio; los parámetros productivos se fijan en feature engineering (fit en train).
+
+### 04_feature_engineering.md
 
 Debe definir:
 
@@ -70,10 +91,11 @@ Debe definir:
 * variables excluidas
 * chequeos de leakage
 
-### 04_modeling_validation.md
+### 05_modeling_validation.md
 
 Debe definir:
 
+* **baseline obligatorio**: regla simple, azar o el modelo/status quo actual del cliente — el modelo final debe superarlo (quality gate); sin lift demostrado vs status quo no hay business case
 * algoritmo baseline
 * challengers
 * split train/test/OOT
@@ -86,7 +108,7 @@ Debe definir:
 
 > **Opcional — reject inference (originación):** si el modelo es de originación y hay población rechazada significativa, definir si se aplica reject inference y con qué método (reclasificación / parcelling / augmentation / Heckman), y marcarlo explícito en la spec (`reject inference: sí/no + método`). Ver `modulos-opcionales.md`.
 
-### 05_deployment_scoring.md
+### 06_deployment_scoring.md
 
 Debe definir:
 
@@ -98,7 +120,7 @@ Debe definir:
 * consumo operativo
 * rollback
 
-### 06_monitoring.md
+### 07_monitoring.md
 
 Debe definir:
 
@@ -111,17 +133,19 @@ Debe definir:
 * thresholds
 * acciones correctivas
 
-### 07_report.md
+### 08_report.md
 
-Debe definir:
+Debe definir (estándar completo en `informe-ejecutivo.md`):
 
-* audiencia
+* audiencia y piezas del entregable (deck ejecutivo / informe técnico / anexos)
+* executive summary autocontenido, ≤ 1 página, respuesta primero (pyramid principle)
 * estructura del informe
-* tablas
-* gráficos
+* so-what cuantificado por hallazgo (hallazgo → implicancia → recomendación → impacto → esfuerzo/owner)
+* tablas y gráficos con assertion titles, fuente y fecha de corte
 * narrativa ejecutiva
 * anexos técnicos
-* limitaciones
+* supuestos, limitaciones y condiciones de uso (obligatorio)
+* quality gate: consistencia de cifras entre summary, cuerpo y anexos; cada cifra rastreable a un output
 
 ---
 
@@ -136,17 +160,19 @@ specs/
 ├── 00_prd_reference.md
 ├── 01_population_scope.md
 ├── 02_data_snapshot.md
-├── 03_feature_space.md
-├── 04_clustering_validation.md
-├── 05_segment_interpretation.md
-├── 06_deployment_tagging.md
-└── 07_report.md
+├── 03_eda.md
+├── 04_feature_space.md
+├── 05_clustering_validation.md
+├── 06_segment_interpretation.md
+├── 07_deployment_tagging.md
+└── 08_report.md
 ```
 
 Debe documentarse:
 
 * población
 * unidad de análisis
+* EDA: distribuciones, missing, outliers y correlaciones de las variables de segmentación (spec `03_eda.md`)
 * variables de segmentación
 * variables descriptivas no usadas para clusterizar
 * normalización
