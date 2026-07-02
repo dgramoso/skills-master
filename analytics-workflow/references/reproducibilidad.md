@@ -66,10 +66,11 @@ Debe ejecutar todo el pipeline en orden:
 source("scripts/00_config.r")
 
 source("scripts/01_ingesta.r")
-source("scripts/02_features.r")
-source("scripts/03_modelizacion.r")
-source("scripts/04_validacion.r")
-source("scripts/05_informe.r")
+source("scripts/02_eda.r")          # etapa EDA; escribe tablas/gráficos a EDA/
+source("scripts/03_features.r")
+source("scripts/04_modelizacion.r")
+source("scripts/05_validacion.r")
+source("scripts/06_informe.r")
 ```
 
 Reglas:
@@ -79,6 +80,8 @@ Reglas:
 * no debe depender de objetos en memoria
 * debe fallar ruidosamente si algo está mal
 * debe guardar logs o mensajes suficientes para auditoría
+
+> **Los scripts no mapean 1:1 con las specs.** Varias specs pueden colapsar en un script (o al revés). Lo que importa es que el pipeline cubra todas las specs aprobadas, no que haya un script por spec.
 
 ---
 
@@ -108,3 +111,21 @@ Registrar en `CONTEXT.md`:
 * sistema operativo si importa
 * paquetes críticos
 * versión de paquetes si hay riesgo de incompatibilidad
+
+---
+
+## Equivalentes en Python
+
+La metodología es idéntica; cambian las herramientas:
+
+| R | Python |
+| --- | --- |
+| `00_config.r` | `00_config.py` (ver `templates/00_config.py`) |
+| `source(...)` en `00_run_pipeline.r` | `00_run_pipeline.py` que importa y llama a cada módulo, o `if __name__ == "__main__"` por script |
+| `mis_funciones.r` | `utils.py` o un paquete del proyecto |
+| `.rds` | `.parquet` (datos) / `.pkl` o `.joblib` (modelos) |
+| `renv` + `renv.lock` | `uv` (`uv.lock`), Poetry (`poetry.lock`) o `pip-tools` (`requirements.txt` con hashes) |
+| `~/.Renviron` | `.env` (con `python-dotenv`) o variables de entorno del sistema |
+| `set.seed(SEED)` | `random.seed(SEED)` + `np.random.seed(SEED)` + la seed del framework (`random_state` en sklearn, etc.) |
+
+Regla igual que en R: se commitea el lockfile, no el entorno. Agregar `.venv/` (y `renv/library/`) a `.gitignore`.

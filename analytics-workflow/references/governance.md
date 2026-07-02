@@ -19,6 +19,8 @@ modelos/
     ...
 ```
 
+> Las extensiones `.rds` son de R. En Python usar `.pkl`/`.joblib` (modelo) y `.parquet`/`.json` (metadata). El versionado por carpetas `vN/` es idéntico.
+
 `CHANGELOG.md` mínimo (ver `templates/CHANGELOG.md.tmpl`):
 
 ```markdown
@@ -77,3 +79,5 @@ Estados:
 ```text
 desarrollo → validación → producción → deprecado
 ```
+
+> Estas columnas asumen un modelo **supervisado de clasificación**. Para clustering o dashboards, reemplazar las métricas (`auc_*`, `gini_test`, `ks_test`) por las relevantes (silhouette, tamaño y estabilidad de segmentos, cobertura del KPI) o dejar en blanco las que no apliquen.
