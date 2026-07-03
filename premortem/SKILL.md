@@ -27,7 +27,8 @@ Buenos objetivos para un premortem:
 - Cualquier compromiso donde el coste de equivocarse es alto
 
 Malos objetivos para un premortem:  
-- Ideas vagas sin ningún plan concreto todavía (ayúdalos a planificar primero, luego haz el premortem)  
+- Ideas vagas sin ningún plan concreto todavía (derivar al skill `pensamiento-critico` primero, luego haz el premortem)  
+- Opciones todavía sin elegir que hay que comparar y rankear (derivar al skill `strategic-problem-solving`)  
 - Preguntas con una sola respuesta correcta (simplemente respóndelas)  
 - Solicitudes de retroalimentación creativa sobre un borrador (eso es edición, no un premortem)  
 - Decisiones que ya están tomadas e irreversibles (un premortem solo es útil cuando aún puedes cambiar de rumbo)

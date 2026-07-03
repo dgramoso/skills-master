@@ -168,6 +168,8 @@ CAPA 3 — ¿Qué provoca ESO en 6-12 meses?
 
 ## FASE 5 — Premortem: El Fracaso Ya Ocurrió
 
+> Si el coste de equivocarse es alto (dinero, reputación, irreversibilidad), ofrecer correr el skill `premortem` completo (subagentes paralelos + informe HTML) en lugar de esta versión reducida.
+
 **Asumir que la decisión tomada llevó al fracaso. Han pasado 6 meses.**
 
 > *"Imaginate que tomaste la decisión. Estamos 6 meses después y fracasó. No fue lo que esperabas. Ahora trabajamos hacia atrás."*

@@ -82,7 +82,7 @@ Las fases activas dependen del triage. El detalle operativo completo de cada fas
 - **Fase 7 — Escenarios.** 3 a 6 escenarios (baseline, mejora pragmática, diferenciación estratégica, antifrágil, lateral/disruptivo) con tabla comparativa.
 - **Fase 8 — Portafolio de soluciones.** No-regret moves, option bets, capability builders, diferenciadores, movidas defensivas y stop-doing.
 - **Fase 9 — Scoring ponderado / AHP.** Criterios, pesos y puntuación transparentes. Detalle, pesos default por contexto y procedimiento AHP en `references/ahp-scoring.md`; cálculo con `scripts/ahp.py`.
-- **Fase 10 — Red-team.** Para cada finalista: supuestos críticos, qué puede salir mal, quién resiste, efectos de segundo orden, costos ocultos, señal de alerta temprana, cómo capear el downside. No recomendar opciones con falla fatal sin mitigar, salvo que todas las alternativas sean peores y quede explícito.
+- **Fase 10 — Red-team.** Para cada finalista: supuestos críticos, qué puede salir mal, quién resiste, efectos de segundo orden, costos ocultos, señal de alerta temprana, cómo capear el downside. No recomendar opciones con falla fatal sin mitigar, salvo que todas las alternativas sean peores y quede explícito. Para la opción ganadora en decisiones de alto coste de error, ofrecer el skill `premortem` como red-team profundo.
 - **Fase 11 — Recomendaciones finales.** Hasta tres, rankeadas. Cada una con: nombre, por qué ese ranking, fit de escenario, impacto esperado cuantificado, riesgo principal, primera acción a 30 días, KPI o señal de validación, decision gate. En problemas amplios, la primera recomendación suele ser un portafolio, no una acción aislada.
 
 ---
