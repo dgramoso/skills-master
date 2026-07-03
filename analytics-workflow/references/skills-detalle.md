@@ -65,7 +65,7 @@ Regla:
 
 ## Generación de specs analíticas
 
-Si existe skill específica: `/analytics-spec`. Si no, usar prompt manual equivalente:
+No hay skill dedicada; usar este prompt manual:
 
 ```text
 Crear la spec [nombre] para el PRD [nombre].

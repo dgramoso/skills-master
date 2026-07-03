@@ -1,6 +1,11 @@
 ---
 name: metodologia-credit-scoring
-description: Metodología integral SDD + Ponytail para proyectos de credit scoring con Claude Code, a estándar de consultora internacional. Proceso — fases de engagement con gates de aprobación del cliente, data audit go/no-go, premortem, decision log auditable, validación independiente, reproducibilidad (renv), versionado de modelos, paquete de handover. Técnica (guía Siddiqi embebida en references/credit-scoring.md) — definición de target con roll rates/vintage, WOE/IV, binning, segmentación de scorecards, regresión logística, benchmark contra baseline con DeLong, validación OOT con IC bootstrap, calibración y master scale, strategy tables con swap set y cutoff económico, fair lending y reason codes, PSI, monitoreo, governance regulatoria (SR 11-7, IFRS 9, Basilea), modelos .rds e informes ejecutivos. Invocar al inicio de cualquier proyecto de credit scoring o modelo predictivo, y al desarrollar, auditar, validar, monitorear o documentar scorecards.
+description: >
+  Use when starting any credit scoring or predictive risk model project, and when
+  developing, auditing, validating, monitoring, or documenting scorecards. Triggers:
+  "credit scoring", "scorecard", "modelo de riesgo", WOE, IV, binning, PSI, KS,
+  master scale, strategy tables, reject inference, fair lending, roll rates, vintage,
+  validación OOT, SR 11-7, IFRS 9, Basilea, metodología Siddiqi.
 ---
 
 # Metodología de Trabajo: SDD + Ponytail + Skills para Proyectos de Credit Scoring
@@ -86,66 +91,6 @@ nombre_proyecto/
 
 ---
 
-## Skills y orden de invocación
-
-```
-Inicio de proyecto:
-  /setup-matt-pocock-skills   ← una sola vez, configura el repo
-  references/credit-scoring.md ← leer: estructura de carpetas, specs y quality gates
-
-Definición de alcance (una sola vez, antes de cualquier spec):
-  /to-prd                     ← dump libre del proyecto → genera specs/00_proyecto.md
-  /grill-with-docs            ← cuestiona el alcance, actualiza CONTEXT.md con decisiones de negocio
-  /premortem                  ← asume que el proyecto ya falló y trabaja hacia atrás; riesgos a CONTEXT.md
-
-Por cada etapa del pipeline:
-  1. /to-prd                  ← convierte tu descripción en spec borrador
-  2. /grill-with-docs         ← cuestiona la spec antes del código
-  3. (opcional) /to-issues    ← genera backlog en GitHub si el proyecto dura semanas
-  4. código                   ← Claude implementa siguiendo la spec
-  5. /code-review             ← revisa el script antes de avanzar
-
-Al modelizar:
-  references/credit-scoring.md ← leer: guía metodológica Siddiqi de punta a punta
-  /advanced-analytics          ← complementa con enfoque de negocio
-
-Transversal durante todo el proyecto:
-  ponytail (activo por default) ← modo de trabajo, se declara al inicio de sesión
-
-Al finalizar el pipeline:
-  /code-review ultra           ← revisión profunda multi-agente antes de entregar al cliente
-  /improve-codebase-architecture ← detecta duplicaciones y refactoriza
-  /graphify                    ← genera grafo del codebase para navegación
-```
-
----
-
-## Referencia de cada skill
-
-**`/to-prd`** — convierte descripción en lenguaje natural en spec estructurada (objetivo, precondiciones, postcondiciones, quality gates, invariantes). Usar antes de cada etapa y al inicio para definir alcance con el cliente.
-
-**`/grill-with-docs`** — lee la spec y CONTEXT.md, hace preguntas críticas una por una, actualiza CONTEXT.md con las decisiones que emergen. Responder una pregunta a la vez. Nunca saltar al código sin grilear la spec. **Diferencia clave:** no actualiza specs, actualiza CONTEXT.md con conocimiento de dominio (el "por qué").
-
-**`/premortem`** — después de definir alcance: asume que el proyecto falló a los 6 meses y lista los motivos. Modos de falla típicos en scoring: datos peores de lo prometido, target indefendible, cliente sin capacidad de implementar el score. Riesgos y mitigaciones quedan en CONTEXT.md.
-
-**`references/credit-scoring.md`** — guía técnica embebida en esta skill (no es una skill aparte): metodología completa Siddiqi con WOE/IV, binning, segmentación, champion vs challengers con baseline, calibración y master scale, PSI, scorecard, strategy tables con swap set, fair lending, governance e informe. Leerla al armar la estructura, al escribir cada spec y al modelizar.
-
-**`/advanced-analytics`** — exige que cada resultado técnico tenga traducción práctica de negocio. Usar junto a `references/credit-scoring.md`.
-
-**`ponytail`** — modo de trabajo, no skill invocable. Activo durante toda la sesión. Marca el código deliberadamente simplificado con `# ponytail: <razón>`.
-
-**`/improve-codebase-architecture`** — solo al final, cuando todos los scripts funcionan. Detecta duplicaciones y propone refactor.
-
-**`/code-review` / `/code-review ultra`** — `/code-review` después de cada script. `/code-review ultra` una sola vez antes de entregar.
-
-**`/to-issues`** — solo si hay equipo o el cliente quiere visibilidad del backlog.
-
-**`/graphify`** — cuando hay ≥ 3 scripts relacionados. Útil al retomar proyectos o para onboarding.
-
-**`/tdd`** — solo para funciones reutilizables en `mis_funciones.R`. Los `stop()` en los scripts ya son TDD implícita.
-
----
-
 ## Definición de target y ventanas
 
 El error más caro en credit scoring no está en el código — está en cómo se define a quién se predice y sobre qué período. Documentar en `CONTEXT.md` **antes** de la spec 01.
@@ -201,9 +146,14 @@ Una sola vez al inicio del proyecto:
    /grill-with-docs sobre specs/00_proyecto.md
    → Claude cuestiona el alcance una pregunta a la vez
    → cada respuesta actualiza CONTEXT.md (target, ventanas, población, restricciones)
+   → diferencia clave: no actualiza specs — actualiza CONTEXT.md con el conocimiento
+     de dominio (el "por qué"). Nunca saltar al código sin grilear la spec.
    → commit: "spec: 00_proyecto — alcance validado"
 
    /premortem sobre el plan
+   → asume que el proyecto falló a los 6 meses y lista los motivos
+   → modos de falla típicos en scoring: datos peores de lo prometido,
+     target indefendible, cliente sin capacidad de implementar el score
    → riesgos y mitigaciones quedan en CONTEXT.md
    → los riesgos que dependen del cliente (calidad de datos, implementación)
      se comunican en el kickoff, no cuando se materializan
@@ -212,7 +162,8 @@ Para cada etapa del pipeline:
 
 1. /to-prd
    → describís la etapa en lenguaje natural
-   → Claude genera spec borrador
+   → Claude genera spec borrador (objetivo, precondiciones, postcondiciones,
+     quality gates, invariantes)
 
 2. /grill-with-docs
    → Claude lee la spec y CONTEXT.md
@@ -228,7 +179,7 @@ Para cada etapa del pipeline:
    → el script corre sin errores desde cero
    → outputs en EDA/ o datos/processed/
 
-5. /code-review (opcional por etapa)
+5. /code-review
    → revisa el script antes de avanzar a la siguiente etapa
 
    Al finalizar el pipeline completo (una sola vez):
@@ -440,17 +391,16 @@ mkdir -p specs scripts datos/raw datos/processed EDA modelos/v1 \
 
 ## Referencia rápida de skills por momento
 
-| Momento | Skills |
-|---|---|
-| Inicio del proyecto | `/setup-matt-pocock-skills` + leer `references/credit-scoring.md` (estructura y specs) |
-| Definición de alcance | `/to-prd` → `/grill-with-docs` → `/premortem` |
-| Antes de cada etapa | `/to-prd` |
-| Después de la spec | `/grill-with-docs` |
-| Al modelizar | `references/credit-scoring.md` + `/advanced-analytics` |
-| Después de cada script | `/code-review` |
-| Proyecto con equipo / cliente | `/to-issues` |
-| Pipeline completo | `/code-review ultra` → `/improve-codebase-architecture` → `/graphify` |
-| Cerrar sesión / transferir trabajo | `/handoff` o `/handoff "próximo objetivo"` |
-| Retomar proyecto pausado | `graphify query "<pregunta>"` |
-| Funciones reutilizables | `/tdd` |
-| Modo de trabajo permanente | `ponytail full` |
+| Momento | Skills | Nota |
+|---|---|---|
+| Inicio del proyecto (una vez) | `/setup-matt-pocock-skills` + leer `references/credit-scoring.md` | Configura el repo; la referencia define estructura, specs y gates |
+| Definición de alcance (una vez) | `/to-prd` → `/grill-with-docs` → `/premortem` | Ver "Flujo completo por etapa", paso 0 |
+| Antes de cada etapa | `/to-prd` → `/grill-with-docs` | Spec borrador, cuestionada antes del código |
+| Al modelizar | `references/credit-scoring.md` + `/advanced-analytics` | La referencia da la técnica Siddiqi; advanced-analytics exige traducción de negocio de cada métrica |
+| Después de cada script | `/code-review` | Obligatorio antes del commit del script |
+| Proyecto con equipo / cliente | `/to-issues` | Solo si hay equipo o el cliente quiere visibilidad del backlog |
+| Pipeline completo (una vez) | `/code-review ultra` → `/improve-codebase-architecture` → `/graphify` | improve-codebase solo cuando todos los scripts funcionan; graphify útil con ≥ 3 scripts relacionados y al retomar u onboardear |
+| Cerrar sesión / transferir trabajo | `/handoff "próximo objetivo"` | Compacta la sesión en un documento de transferencia |
+| Retomar proyecto pausado | `graphify query "<pregunta>"` | |
+| Funciones reutilizables | `/tdd` | Solo para `mis_funciones.R`; los `stop()` de los scripts ya son TDD implícita |
+| Modo de trabajo permanente | `ponytail` (full) | No es skill invocable: se declara al inicio de sesión; marcar simplificaciones con `# ponytail: <razón>` |

@@ -1,6 +1,6 @@
 ---
 name: advanced-analytics
-description: Ejecución técnica e interpretación de negocio para proyectos de analítica avanzada a estándar de consultora internacional (McKinsey/EY/Experian). Cubre EDA guiado por hipótesis, segmentación, scoring, regresión, clasificación, clustering, forecasting, driver analysis, traducción de métricas (AUC, KS, PSI, R², MAPE) a decisiones, so-what cuantificado y QA analítico. Usar para analizar datasets (CSV, SQL, Excel), construir modelos, identificar drivers o convertir hallazgos técnicos en recomendaciones ejecutivas. Complementa a analytics-workflow (proceso SDD) y metodologia-credit-scoring (metodología crediticia).
+description: Usar cuando hay que analizar un dataset (CSV, SQL, Excel), hacer EDA, construir o evaluar modelos (regresión, clasificación, clustering, forecasting, segmentación, scoring), identificar drivers, o traducir métricas técnicas (AUC, KS, PSI, IV, R², MAPE) a decisiones de negocio y recomendaciones ejecutivas. Estándar de consultora internacional (McKinsey/EY/Experian). Complementa a analytics-workflow (proceso SDD) y metodologia-credit-scoring (metodología crediticia).
 ---
 
 # Advanced Analytics — Ejecución e Interpretación
@@ -18,7 +18,7 @@ Esta skill define **cómo se hace y cómo se interpreta un análisis**. No defin
 | QA pre-entrega del proyecto completo y quality gates de pipeline | `analytics-workflow/references/quality-gates.md` |
 | Metodología crediticia completa (WOE/IV, scorecard, OOT, strategy tables) | `metodologia-credit-scoring` (+ su `references/credit-scoring.md`) |
 | Funciones ya testeadas (PSI, KS, AUC/Gini, lift, WOE/IV fit-apply) | `analytics-workflow/templates/mis_funciones.r` · `utils.py` |
-| Diseño de gráficos y dashboards | skill `dataviz` |
+| Diseño de gráficos y dashboards | skills del plugin data: `data:create-viz` · `data:data-visualization` |
 
 **Cuándo se invoca esta skill:** análisis exploratorio o modelado dentro de una etapa del pipeline, driver analysis, o cuando hay resultados técnicos que traducir a decisiones de negocio.
 
@@ -30,7 +30,7 @@ Esta skill define **cómo se hace y cómo se interpreta un análisis**. No defin
 2. **80/20.** Identificar primero las 2-3 variables o segmentos que concentran la mayor parte del efecto. Profundizar solo donde el impacto potencial lo justifica.
 3. **Baseline obligatorio.** Ningún modelo ni recomendación se reporta sin comparación contra el status quo del cliente o una regla naive. La complejidad se justifica solo si mejora la decisión de negocio de forma material.
 4. **Separación epistémica.** Todo output distingue explícitamente: **hecho** (observado en datos), **estimación** (salida de modelo con incertidumbre), **supuesto** (declarado, no verificado) y **recomendación** (juicio). Nunca mezclarlos en una misma frase sin etiqueta.
-5. **Materialidad antes que significancia.** Un efecto estadísticamente significativo pero económicamente irrelevante no es un hallazgo. Un segmento se reporta solo si es accionable y tiene tamaño mínimo (default: ≥ 5% de la población o n ≥ 100; ajustar en la spec).
+5. **Materialidad antes que significancia.** Un efecto estadísticamente significativo pero económicamente irrelevante no es un hallazgo. Un segmento se reporta solo si es accionable y tiene tamaño mínimo (default: ≥ 5% de la población o n ≥ 100, lo que sea mayor; ajustar en la spec).
 6. **Riesgos de primera clase:** leakage, sesgo de muestreo, fechas de corte, definición de target, población de desarrollo vs población de aplicación, paradoja de Simpson al agregar. Se verifican, no se asumen.
 7. **Reproducibilidad.** Código modular y rerunnable: parámetros en `00_config`, fit en train / apply en test, outputs a carpetas del proyecto (`EDA/`, `datos/processed/`, `reportes/`). Preferir Python (`pandas`, `numpy`, `scikit-learn`) o R según el proyecto; SQL para transformaciones pesadas en warehouse.
 
@@ -87,7 +87,7 @@ Elegir el modelo más simple que responde la pregunta. Por tipo:
 | Credit scoring | Regla vigente / score anterior | Derivar a la skill `metodologia-credit-scoring` |
 
 - Reportar siempre la comparación contra baseline y el veredicto: ¿la complejidad extra mejora la decisión lo suficiente?
-- **Disparadores de sospecha** (auditar antes de reportar): AUC > 0.90 en datos de comportamiento, R² > 0.95 en datos de negocio, una feature con > 50% de la importancia total, performance en test mejor que en train.
+- **Disparadores de sospecha** (auditar antes de reportar): una variable con IV > 0.9 (leakage casi seguro), R² > 0.95 en datos de negocio, una feature con > 50% de la importancia total, performance en test mejor que en train.
 
 ### 5. Driver analysis
 
@@ -117,9 +117,10 @@ Usar estos rangos como lenguaje por defecto al comunicar a negocio. Son heuríst
 | AUC | < 0.60 | Apenas mejor que el azar; no usar para decidir |
 | | 0.60–0.70 | Ordena con capacidad modesta; útil solo para priorización gruesa |
 | | 0.70–0.80 | Ordena bien; apto para priorización y estrategia, no para decisión individual automática |
-| | > 0.80 | Discriminación fuerte; verificar leakage antes de celebrar |
+| | > 0.80 | Discriminación fuerte; antes de celebrar, revisar el IV de cada variable — IV > 0.9 indica leakage |
 | KS | < 20 | Separación débil |
 | | 20–40 | Separación aceptable a buena |
+| | 40–50 | Separación fuerte; verificar variables antes de reportar |
 | | > 50 | Sospechar leakage o target mal definido |
 | PSI | < 0.10 | Población estable |
 | | 0.10–0.25 | Drift moderado; monitorear y revisar variables |
@@ -153,7 +154,7 @@ Checklist propio de cada análisis — complementa (no reemplaza) el QA pre-entr
 | "Insight" que es una descripción ("las ventas suben en diciembre") | Un insight cambia una decisión; si no, es contexto |
 | Explorar sin hipótesis y reportar todo lo encontrado | Árbol MECE primero; reportar solo lo que responde hipótesis |
 | Promediar sobre poblaciones heterogéneas | Desagregar por segmento antes de afirmar; chequear Simpson |
-| Celebrar AUC 0.95 | Auditar leakage: es el diagnóstico más probable |
+| Celebrar AUC 0.95 | Auditar leakage revisando el IV por variable: IV > 0.9 es el diagnóstico más probable |
 | Recomendar sobre un segmento de n = 12 | Aplicar umbral de materialidad |
 | Afirmar causalidad desde correlación | Lenguaje de asociación salvo diseño causal |
 | Imputar o excluir nulos en silencio | Política de missing declarada y reportada |

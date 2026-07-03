@@ -79,23 +79,11 @@ Si el proyecto ya posee una estructura consolidada, respetar nombres y convencio
 
 Antes de implementar cualquier script, crear y completar la spec correspondiente en `specs/`. El código existe para cumplir la spec — no al revés.
 
-## Flujo obligatorio
-
-```
-0. Definición de alcance (una sola vez al inicio del proyecto):
-   /to-prd          → dump libre del proyecto en lenguaje natural → specs/00_proyecto.md
-   /grill-with-docs → cuestiona el alcance, actualiza CONTEXT.md con decisiones de negocio
-                      (target, ventanas, población, fuentes, restricciones regulatorias)
-
-1. Completar specs/<etapa>.md        ← ANTES de escribir código
-2. Confirmar con el usuario si hay decisiones metodológicas abiertas
-3. Implementar el script             ← cumpliendo precondiciones y postcondiciones
-4. Incluir quality gates como código ejecutable que falla explícitamente
-```
+**El proceso SDD (qué skill invocar, en qué orden, con qué gates) lo define el SKILL.md de esta skill — no duplicarlo acá.** Esta referencia define los artefactos: el contenido de `specs/00_proyecto.md`, el template de spec por etapa y las specs pre-llenadas.
 
 ### `specs/00_proyecto.md` — output del alcance inicial
 
-Generado por `/to-prd` al inicio. Contiene:
+Generado en la Fase 0 (ver SKILL.md). Contiene:
 - Objetivo del modelo y decisión de negocio que habilita
 - Población elegible y exclusiones
 - Fuentes de datos disponibles
@@ -103,8 +91,6 @@ Generado por `/to-prd` al inicio. Contiene:
 - Restricciones regulatorias o de negocio
 - Qué queda fuera del alcance
 - Preguntas abiertas que `/grill-with-docs` va a resolver
-
-**`/to-prd` con cliente presente:** describís el proyecto en lenguaje natural mientras el cliente habla → Claude genera el borrador → el cliente valida antes de salir de la reunión. Salís con el alcance firmado implícitamente.
 
 ## Template de spec por etapa
 

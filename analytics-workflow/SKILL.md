@@ -1,7 +1,6 @@
 ---
 name: analytics-workflow
-description: Workflow SDD para proyectos de analítica, machine learning, scoring, segmentación, dashboards y reportería. Define el flujo PRD → specs → grill → issues → código → validación → entrega, con Ponytail, trazabilidad metodológica, reproducibilidad e interpretabilidad.
-disable-model-invocation: true
+description: Usar cuando arranca un proyecto de analítica, machine learning, credit scoring, cobranza, churn, fraude, segmentación, clustering, dashboard o reportería; cuando hay que estructurar el PRD, las specs, el pipeline o la entrega de un engagement de datos; o cuando el usuario pide metodología, workflow o SDD para un proyecto analítico.
 ---
 
 # Analytics Workflow — SDD + Ponytail + Skills
@@ -34,8 +33,8 @@ Este `SKILL.md` es el núcleo navegable. El detalle operativo vive en archivos a
 | Gestión del engagement: intake, decision log, minutas, status, change request, cierre/handover, política de datos | `references/engagement.md` |
 | Estándar de informe ejecutivo: pyramid principle, so-what, visualización, piezas del entregable | `references/informe-ejecutivo.md` |
 | Módulos avanzados **opcionales** (reject inference, validación formal + MDD, fairness, data governance) — activar solo si el cliente/regulador lo exige | `references/modulos-opcionales.md` |
-| Plantillas copiables | `templates/00_config.r` (R), `templates/00_config.py` (Python), `templates/CLAUDE.md.tmpl`, `templates/CHANGELOG.md.tmpl`, y artefactos de engagement/entrega: `decision_log`, `minuta`, `status_report`, `informe_ejecutivo`, `qa_pre_entrega`, `acta_cierre` (`.md.tmpl`) |
-| Biblioteca semilla de funciones **testeada** (PSI, KS, AUC/Gini, lift/gain, strategy table, winsorización fit/apply, WOE/IV fit/apply, validación de porcentajes) | `templates/mis_funciones.r` + `templates/test_mis_funciones.r` (R) · `templates/utils.py` + `templates/test_utils.py` (Python) |
+| Plantillas copiables (config R/Python, CLAUDE.md, CHANGELOG, artefactos de engagement/entrega) | `templates/` |
+| Biblioteca semilla de funciones **testeada** (PSI, KS, AUC/Gini, lift/gain, strategy table, winsorización, WOE/IV, validación de porcentajes) | `templates/mis_funciones.r` + tests (R) · `templates/utils.py` + tests (Python) |
 
 ---
 
@@ -121,6 +120,7 @@ Reglas:
 * Todo output reproducible va a `datos/processed/`, `EDA/`, `modelos/`, `reportes/`, `graficos/` o `logs/`.
 * Todo parámetro que puede cambiar entre proyectos vive en `scripts/00_config.r` (o `00_config.py`).
 * Ningún script depende de pasos manuales invisibles.
+* La numeración y contenido de las specs (`01_…07_`) por tipo de proyecto está definida en `references/specs-por-tipo.md`.
 
 > **Nombres por lenguaje.** Los nombres de archivo de esta skill están en R (`00_config.r`, `mis_funciones.r`, `.rds`); en Python usar los equivalentes `.py` (`00_config.py`, `utils.py`, `.parquet`/`.pkl`). La metodología es idéntica — ver la sección "Equivalentes en Python" en `references/reproducibilidad.md`.
 
@@ -183,12 +183,12 @@ Tabla de routing. El detalle de uso y los prompts recomendados están en `refere
 |---|---|---|
 | Configurar repo (1 vez) | `/setup-matt-pocock-skills` | Issue tracker, labels, docs de dominio |
 | Crear PRD padre (1 vez/iniciativa) | `/to-prd` | No usar antes de cada script |
-| Crear spec analítica | `/analytics-spec` (si existe) o prompt manual | Una por componente crítico |
+| Crear spec analítica | Prompt manual (ver `references/skills-detalle.md`) | Una por componente crítico |
 | Cuestionar spec | `/grill-with-docs` | Habilita implementación |
 | Crear backlog | `/to-issues` | Solo con equipo / trazabilidad / agentes |
 | Metodología credit scoring | `/metodologia-credit-scoring` | Solo proyectos crediticios |
 | Interpretación de negocio | `/advanced-analytics` | Traducir métricas a decisiones |
-| Implementar | `ponytail full` | Modo permanente, no se invoca |
+| Implementar | Ponytail full (modo permanente, no es una skill que se invoca) | Mínimo código que pasa quality gates |
 | Funciones reutilizables | `/tdd` | Arrancar de la biblioteca semilla (`templates/mis_funciones.r` / `utils.py`, ya testeada); `/tdd` solo para funciones nuevas |
 | Revisar script | `/code-review` | Después de cada script |
 | Revisar entrega completa | `/code-review ultra` | Una sola vez al final |
@@ -263,10 +263,7 @@ No alcanza con `PSI = 0.31`. Debe decirse:
 | Crear issues demasiado grandes | Dividir por tarea ejecutable y acceptance criteria. |
 | Llamar a Claude API con datos sensibles innecesarios | Enviar métricas agregadas y revisar narrativa. |
 | Confiar en paquetes sin versionar | Usar `renv` si el proyecto debe reproducirse. |
-| Entregar sin QA pre-entrega | Reproducir en limpio y verificar cifras antes del informe. |
 | Prometer métricas concretas antes del EDA | Calibrar expectativas recién después del diagnóstico de datos. |
-| Decisión del cliente sin registrar | Toda aprobación va al decision log con fecha. |
-| Reportar performance sin baseline | Comparar siempre contra baseline naive o status quo del cliente. |
 | Título de gráfico que describe en vez de afirmar | Assertion titles: el título es el hallazgo. |
 
 ---
@@ -298,13 +295,6 @@ Después: crear specs hijas según el tipo de proyecto (ver `references/specs-po
 ---
 
 ## Principio final
-
-El workflow correcto no es `idea → código → arreglar documentación`. Es:
-
-```text
-kickoff → PRD → specs → grill → issues (opcional) → código → validación
-  → QA pre-entrega → informe → entrega → handover
-```
 
 * Si una decisión no está documentada, no existe.
 * Si el cliente no lo aprobó por escrito, no está aprobado.
