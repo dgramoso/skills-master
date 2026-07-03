@@ -1,14 +1,10 @@
 ---
 name: lecciones-aprendidas
 description: >
-  Guía al usuario a documentar lecciones aprendidas al cierre de un proyecto o sesión
-  importante, mediante un flujo conversacional por secciones. Aprovecha el contexto de la
-  sesión (conversación, git log) para proponer borradores en vez de preguntar en frío.
-  Guarda el resultado en un archivo markdown acumulativo y opcionalmente actualiza
-  CLAUDE.md y la memoria persistente. Use when the user finishes a project, sprint, or
-  important session and wants to capture what went well, what went wrong, key decisions,
-  and reusable patterns. Triggered by /lecciones-aprendidas, "lecciones aprendidas",
-  "retrospectiva", "qué aprendimos", or "cierre de proyecto".
+  Use when the user finishes a project, sprint, or important session and wants
+  to capture lessons learned — what went well, what went wrong, key decisions,
+  and reusable patterns. Triggered by /lecciones-aprendidas, "lecciones
+  aprendidas", "retrospectiva", "qué aprendimos", or "cierre de proyecto".
 ---
 
 # lecciones-aprendidas
@@ -17,7 +13,7 @@ description: >
 
 **Modo completo** (default): flujo conversacional por secciones, descrito abajo. Para cierres de proyecto o retrospectivas donde el usuario quiere reflexionar.
 
-**Modo rápido**: si el usuario pasa `rapido` como argumento, o si la skill se invoca como parte del cierre de sesión (ej: antes de compactar contexto), no hagas las preguntas una por una. Generá la entrada completa desde el contexto de la sesión (ver "Usar el contexto" abajo), mostrala al usuario y pedí una sola confirmación o corrección antes de guardar. Después seguí directo al paso 7.
+**Modo rápido**: solo si el usuario pasa `rapido` como argumento. No hagas las preguntas una por una: generá la entrada completa desde el contexto de la sesión (ver "Usar el contexto" abajo), mostrala al usuario y pedí una sola confirmación o corrección antes de guardar. Después seguí directo al paso 7. Si no hay contexto de sesión útil para generar el borrador, avisale al usuario y caé al modo completo — no inventes una entrada.
 
 ## Usar el contexto
 
@@ -61,7 +57,7 @@ Preguntá:
 
 ### 7. Guardar
 Una vez completadas las secciones:
-1. Guardá el resultado en `lecciones-aprendidas/lecciones-aprendidas.md` (en la raíz del proyecto, creando la carpeta si no existe). Es un único archivo acumulativo: cada retro es una entrada nueva. Usá la plantilla y las reglas de inserción de REFERENCE.md.
+1. Guardá el resultado según "Plantilla y guardado" abajo.
 2. Preguntá: "¿Querés que actualice el CLAUDE.md del proyecto con alguna de estas lecciones?"
 3. Preguntá: "¿Querés que guarde los patrones reutilizables en tu memoria persistente para futuras sesiones?"
 
@@ -75,3 +71,48 @@ Si el usuario no tiene nada para una sección ("no hubo decisiones clave"), omit
 - Conversacional, no burocrático
 - Breve en las preguntas, generoso en el espacio para responder
 - Si el usuario da una respuesta corta, ofrecé un ejemplo o preguntá si quiere profundizar
+
+## Plantilla y guardado
+
+El archivo `lecciones-aprendidas/lecciones-aprendidas.md` (en la raíz del proyecto actual, creando la carpeta si no existe) es único y acumulativo: cada invocación agrega una nueva entrada. Si no hay proyecto activo (ej: directorio home), preguntá al usuario dónde guardar.
+
+Formato de cada entrada — `{YYYY-MM-DD}` es la fecha de hoy:
+
+```markdown
+---
+
+## {YYYY-MM-DD} — {nombre-proyecto}
+
+**Descripción:** {una línea}
+
+### Qué salió bien
+
+{respuesta del usuario}
+
+### Qué salió mal
+
+{respuesta del usuario}
+
+### Qué haría diferente
+
+{respuesta del usuario}
+
+### Decisiones clave
+
+{respuesta del usuario}
+
+### Patrones reutilizables
+
+{respuesta del usuario}
+```
+
+Reglas de inserción:
+
+- Cada entrada **empieza** con una línea `---` y **no** lleva `---` de cierre — el `---` de la entrada siguiente hace de separador.
+- Si el archivo no existe, crearlo con el encabezado `# Lecciones Aprendidas` seguido de la primera entrada.
+- Si ya existe, NO reescribir el encabezado. Insertar la nueva entrada **inmediatamente después del encabezado**, antes de las entradas existentes — el archivo queda en orden cronológico descendente (lo más reciente arriba).
+- Omitir las secciones para las que el usuario no aportó nada — no incluir secciones vacías ni "N/A".
+
+## Qué va a memoria persistente
+
+Solo los patrones reutilizables que sean generalizables a otros proyectos — no detalles específicos del proyecto actual. Guardar como memoria tipo `project` o `feedback` según corresponda, con las líneas **Why:** y **How to apply:** para que la lección sea accionable en futuras sesiones.
