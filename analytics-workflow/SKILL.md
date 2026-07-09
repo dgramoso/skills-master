@@ -23,7 +23,7 @@ Este `SKILL.md` es el núcleo navegable. El detalle operativo vive en archivos a
 
 | Cuándo lo necesitás | Archivo |
 |---|---|
-| Detalle y prompts de cada skill (`/to-prd`, grill, issues, code-review…) | `references/skills-detalle.md` |
+| Detalle y prompts de cada skill (`/to-spec`, grill, issues, code-review…) | `references/skills-detalle.md` |
 | Specs mínimas por tipo de proyecto (supervisado / clustering / dashboard) | `references/specs-por-tipo.md` |
 | Template general de spec | `references/spec-template.md` |
 | Patrones de quality gates + reglas anti-leakage | `references/quality-gates.md` |
@@ -60,7 +60,7 @@ Código que no cumple la spec → código incorrecto.
 
 Cinco niveles con roles distintos:
 
-- **PRD** — documento padre de una iniciativa. Define problema, solución, usuarios, user stories, alcance, fuera de alcance, criterios de éxito y specs hijas. Uno por iniciativa importante (`/to-prd`). No reemplaza a las specs. Ej: nuevo motor de scoring, sistema de cobranza inteligente, dashboard ejecutivo de riesgo.
+- **PRD** — documento padre de una iniciativa. Define problema, solución, usuarios, user stories, alcance, fuera de alcance, criterios de éxito y specs hijas. Uno por iniciativa importante (`/to-spec`). No reemplaza a las specs. Ej: nuevo motor de scoring, sistema de cobranza inteligente, dashboard ejecutivo de riesgo.
 - **Specs** — documentos operativos: cómo se implementa un componente analítico concreto (target, data snapshot, feature engineering, modeling/validation, deployment, monitoring, report). Cada spec se grilla antes de codear.
 - **Issues** — unidades ejecutables derivadas de specs aprobadas. Opcionales: solo con equipo, backlog visible, ejecución por agentes o trazabilidad con cliente.
 - **CONTEXT.md** — memoria estable del dominio: glosario, reglas de negocio persistentes, definiciones reutilizables, convenciones. No es basurero de decisiones transitorias.
@@ -182,10 +182,10 @@ Tabla de routing. El detalle de uso y los prompts recomendados están en `refere
 | Momento | Skill / acción | Notas |
 |---|---|---|
 | Configurar repo (1 vez) | `/setup-matt-pocock-skills` | Issue tracker, labels, docs de dominio |
-| Crear PRD padre (1 vez/iniciativa) | `/to-prd` | No usar antes de cada script |
+| Crear PRD padre (1 vez/iniciativa) | `/to-spec` | No usar antes de cada script |
 | Crear spec analítica | Prompt manual (ver `references/skills-detalle.md`) | Una por componente crítico |
 | Cuestionar spec | `/grill-with-docs` | Habilita implementación |
-| Crear backlog | `/to-issues` | Solo con equipo / trazabilidad / agentes |
+| Crear backlog | `/to-tickets` | Solo con equipo / trazabilidad / agentes |
 | Metodología credit scoring | `/metodologia-credit-scoring` | Solo proyectos crediticios |
 | Interpretación de negocio | `/advanced-analytics` | Traducir métricas a decisiones |
 | Implementar | Ponytail full (modo permanente, no es una skill que se invoca) | Mínimo código que pasa quality gates |
@@ -247,7 +247,7 @@ No alcanza con `PSI = 0.31`. Debe decirse:
 
 | Error | Corrección |
 |---|---|
-| Usar `/to-prd` para cada script | `/to-prd` crea el PRD padre. Las etapas usan specs. |
+| Usar `/to-spec` para cada script | `/to-spec` crea el PRD padre. Las etapas usan specs. |
 | Escribir código antes de tener spec | Crear spec, grillarla y recién después implementar. |
 | Mandar todas las decisiones a `CONTEXT.md` | Clasificar: contexto, spec, ADR o issue. |
 | Mezclar PRD con spec | PRD define qué y por qué. Spec define cómo. |
@@ -287,7 +287,7 @@ Trabajemos con ponytail full activo.
 
 Crear CLAUDE.md, CONTEXT.md y scripts/00_config.r para este proyecto.
 Completar engagement/intake.md con el checklist de references/engagement.md.
-Luego /to-prd para crear el PRD padre.
+Luego /to-spec para crear el PRD padre.
 ```
 
 Después: crear specs hijas según el tipo de proyecto (ver `references/specs-por-tipo.md`), grillarlas una por una, implementar scripts, correr pipeline, code review.

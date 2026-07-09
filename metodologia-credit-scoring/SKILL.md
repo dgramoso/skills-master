@@ -30,7 +30,7 @@ Tres principios que se aplican siempre, en orden de prioridad:
 
 ```
 Fase 0 — Kickoff y alcance
-  /to-prd → /grill-with-docs → /premortem
+  /to-spec → /grill-with-docs → /premortem
   GATE: cliente valida specs/00_proyecto.md (objetivo, target preliminar, datos comprometidos)
 
 Fase 1 — Data audit (go / no-go)
@@ -138,7 +138,7 @@ El template de spec y las specs pre-llenadas por etapa (`01_ingesta_y_target` a 
 Una sola vez al inicio del proyecto:
 
 0. Definición de alcance
-   /to-prd
+   /to-spec
    → dump libre del proyecto en lenguaje natural (objetivo, datos, población, restricciones)
    → Claude genera specs/00_proyecto.md con alcance, fuera de alcance y preguntas abiertas
    → con cliente presente: el cliente valida el borrador antes de salir de la reunión
@@ -160,7 +160,7 @@ Una sola vez al inicio del proyecto:
 
 Para cada etapa del pipeline:
 
-1. /to-prd
+1. /to-spec
    → describís la etapa en lenguaje natural
    → Claude genera spec borrador (objetivo, precondiciones, postcondiciones,
      quality gates, invariantes)
@@ -380,9 +380,9 @@ mkdir -p specs scripts datos/raw datos/processed EDA modelos/v1 \
 #    - crear CLAUDE.md y CONTEXT.md
 #    - crear scripts/00_config.R
 
-# 5. definir alcance: /to-prd → /grill-with-docs → commit specs/00_proyecto.md
+# 5. definir alcance: /to-spec → /grill-with-docs → commit specs/00_proyecto.md
 
-# 6. por cada etapa: /to-prd → /grill-with-docs → código → /code-review → commit
+# 6. por cada etapa: /to-spec → /grill-with-docs → código → /code-review → commit
 
 # 7. al finalizar: /code-review ultra → /improve-codebase-architecture → /graphify
 ```
@@ -394,11 +394,11 @@ mkdir -p specs scripts datos/raw datos/processed EDA modelos/v1 \
 | Momento | Skills | Nota |
 |---|---|---|
 | Inicio del proyecto (una vez) | `/setup-matt-pocock-skills` + leer `references/credit-scoring.md` | Configura el repo; la referencia define estructura, specs y gates |
-| Definición de alcance (una vez) | `/to-prd` → `/grill-with-docs` → `/premortem` | Ver "Flujo completo por etapa", paso 0 |
-| Antes de cada etapa | `/to-prd` → `/grill-with-docs` | Spec borrador, cuestionada antes del código |
+| Definición de alcance (una vez) | `/to-spec` → `/grill-with-docs` → `/premortem` | Ver "Flujo completo por etapa", paso 0 |
+| Antes de cada etapa | `/to-spec` → `/grill-with-docs` | Spec borrador, cuestionada antes del código |
 | Al modelizar | `references/credit-scoring.md` + `/advanced-analytics` | La referencia da la técnica Siddiqi; advanced-analytics exige traducción de negocio de cada métrica |
 | Después de cada script | `/code-review` | Obligatorio antes del commit del script |
-| Proyecto con equipo / cliente | `/to-issues` | Solo si hay equipo o el cliente quiere visibilidad del backlog |
+| Proyecto con equipo / cliente | `/to-tickets` | Solo si hay equipo o el cliente quiere visibilidad del backlog |
 | Pipeline completo (una vez) | `/code-review ultra` → `/improve-codebase-architecture` → `/graphify` | improve-codebase solo cuando todos los scripts funcionan; graphify útil con ≥ 3 scripts relacionados y al retomar u onboardear |
 | Cerrar sesión / transferir trabajo | `/handoff "próximo objetivo"` | Compacta la sesión en un documento de transferencia |
 | Retomar proyecto pausado | `graphify query "<pregunta>"` | |
