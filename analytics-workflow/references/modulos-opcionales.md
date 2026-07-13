@@ -13,7 +13,7 @@ necesidad explícita, no automáticamente.
 
 ## Cómo se decide: triage en el intake / PRD
 
-Al crear el PRD (`/to-prd`), responder 4 preguntas. Cada "sí" activa su módulo; registrar
+Al crear el PRD (`/to-spec`), responder 4 preguntas. Cada "sí" activa su módulo; registrar
 la decisión (qué se activa y por qué) en el PRD. Si ninguna aplica, el flujo por defecto alcanza.
 
 1. ¿El cliente es una entidad regulada, o el modelo es material (decisiones de crédito a escala)?

@@ -16,12 +16,12 @@ Ejecutar una sola vez por repo. Objetivo:
 
 ---
 
-## `/to-prd` — definición de iniciativa
+## `/to-spec` — definición de iniciativa
 
 Ejecutar una vez por iniciativa importante. El PRD es padre; las specs son hijas.
 
 ```text
-/to-prd
+/to-spec
 
 Crear un PRD padre para [nombre de la iniciativa] usando lo conversado y el estado actual del repo.
 
@@ -42,14 +42,14 @@ No crear todavía issues técnicos salvo que se pida explícitamente.
 Ejemplos:
 
 ```text
-/to-prd
+/to-spec
 
 Crear un PRD para un sistema de cobranza inteligente.
 Debe identificar specs hijas para target, datos, features, modelo, estrategia de acción, monitoreo y reporte.
 ```
 
 ```text
-/to-prd
+/to-spec
 
 Crear un PRD para un nuevo motor de scoring de originación de tarjeta.
 Debe contemplar riesgo, aprobación, explicabilidad, validación, deployment batch y monitoreo.
@@ -58,7 +58,7 @@ Debe contemplar riesgo, aprobación, explicabilidad, validación, deployment bat
 Regla:
 
 ```text
-/to-prd no se usa antes de cada script. Crea el PRD padre, no las etapas.
+/to-spec no se usa antes de cada script. Crea el PRD padre, no las etapas.
 ```
 
 ---
@@ -140,7 +140,7 @@ Ver `SKILL.md` para la tabla de persistencia de decisiones (dónde va cada respu
 
 ---
 
-## `/to-issues` — backlog
+## `/to-tickets` — backlog
 
 Ejecutar solo cuando:
 

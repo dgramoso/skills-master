@@ -38,8 +38,8 @@ Repositorio maestro de IA-Skills
 | `tdd` | Test-driven development, red-green-refactor |
 | `teach` | Enseña al usuario un concepto o skill nuevo dentro del workspace |
 | `technical-exploded-view-infographic` | Genera un prompt de imagen para infografías técnicas exploded-view |
-| `to-issues` | Convierte un plan/spec/PRD en issues independientes (tracer-bullet slices) |
-| `to-prd` | Convierte la conversación actual en un PRD y lo publica en el tracker |
+| `to-tickets` | Convierte un plan/spec/PRD en issues independientes (tracer-bullet slices) |
+| `to-spec` | Convierte la conversación actual en un PRD y lo publica en el tracker |
 | `triage` | Mueve issues y PRs externos por una máquina de estados de triage |
 | `write-a-skill` | Crea una nueva skill de Claude Code con estructura y documentación correctas |
 | `zoom-out` | Da contexto más amplio o una perspectiva de más alto nivel sobre una sección de código |
