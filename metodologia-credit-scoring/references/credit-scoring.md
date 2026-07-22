@@ -42,13 +42,13 @@ credit_scoring/
 |   `-- 05_validacion_y_monitoreo.md
 |
 |-- scripts/
-|   |-- 00_config.R
-|   |-- 00_run_pipeline.R
-|   |-- 01_ingesta_y_target.R
-|   |-- 02_integracion_datos.R
-|   |-- 03_limpieza_y_features.R
-|   |-- 04_modelizacion.R
-|   |-- 05_validacion_y_monitoreo.R
+|   |-- 00_config.R o 00_config.py
+|   |-- 00_run_pipeline.R o
+|   |-- 01_ingesta_y_target.R o
+|   |-- 02_integracion_datos.R o
+|   |-- 03_limpieza_y_features.R o
+|   |-- 04_modelizacion.R o
+|   |-- 05_validacion_y_monitoreo.R 
 |   |-- 06_informe.R
 |   `-- mis_funciones.R
 |
