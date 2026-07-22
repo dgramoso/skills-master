@@ -9,7 +9,7 @@ Skill de **ejecución técnica e interpretación** para proyectos de analítica:
 
 ## Rol dentro del ecosistema
 
-Esta skill define **cómo se hace y cómo se interpreta un análisis**. No define el proceso del proyecto ni el formato del entregable final — eso vive en otras skills. No duplicar sus contenidos: referenciarlos.
+Esta skill define **cómo se hace y cómo se interpreta un análisis**. No define el proceso del proyecto ni el formato del entregable final — eso vive en otras skills. No duplicar sus contenidos: referenciarlos. Las rutas `analytics-workflow/...` y `metodologia-credit-scoring/...` viven en `~/.claude/skills/` — no en el proyecto del cliente.
 
 | Necesidad | Dónde vive |
 |---|---|
@@ -18,7 +18,7 @@ Esta skill define **cómo se hace y cómo se interpreta un análisis**. No defin
 | QA pre-entrega del proyecto completo y quality gates de pipeline | `analytics-workflow/references/quality-gates.md` |
 | Metodología crediticia completa (WOE/IV, scorecard, OOT, strategy tables) | `metodologia-credit-scoring` (+ sus `references/`, por tema) |
 | Funciones ya testeadas (PSI, KS, AUC/Gini, lift, WOE/IV fit-apply) | `analytics-workflow/templates/mis_funciones.r` · `utils.py` |
-| Diseño de gráficos y dashboards | skills del plugin data: `data:create-viz` · `data:data-visualization` |
+| Diseño de gráficos y dashboards | skill `dataviz` |
 
 **Cuándo se invoca esta skill:** análisis exploratorio o modelado dentro de una etapa del pipeline, driver analysis, o cuando hay resultados técnicos que traducir a decisiones de negocio.
 

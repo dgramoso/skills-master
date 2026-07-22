@@ -232,7 +232,7 @@ Invocar cuando el resultado técnico necesite interpretación de negocio. Especi
 * R: `templates/mis_funciones.r` + `templates/test_mis_funciones.r` (testthat; correr con `Rscript test_mis_funciones.r`)
 * Python: `templates/utils.py` + `templates/test_utils.py` (correr con `python test_utils.py`; compatible pytest)
 
-La semilla cubre: PSI, KS, AUC/Gini, tabla lift/gain, strategy table, winsorización fit/apply, WOE/IV fit/apply (convención Siddiqi, missing como bin propio, warning si IV > 1) y validación de porcentajes. Convenciones documentadas en el header: target 1 = evento, mayor score = mayor riesgo, `*_fit` solo con train / `*_apply` congelado.
+La semilla cubre: PSI, KS, AUC/Gini, tabla lift/gain, strategy table, winsorización fit/apply, WOE/IV fit/apply (convención Siddiqi, missing como bin propio, warning si IV > 0.9) y validación de porcentajes. Convenciones documentadas en el header: target 1 = evento, mayor score = mayor riesgo, `*_fit` solo con train / `*_apply` congelado.
 
 Usar TDD formal **solo para funciones que no estén en la semilla**:
 
@@ -258,7 +258,7 @@ Antes de entregar:
 /code-review ultra
 ```
 
-Si hay disponibilidad:
+Si hay disponibilidad del plugin `codex`:
 
 ```text
 /codex:review

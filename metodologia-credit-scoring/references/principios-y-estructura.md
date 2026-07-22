@@ -65,6 +65,8 @@ credit_scoring/
 `-- logs/
 ```
 
+**EDA:** es etapa de primera clase (ver la sección EDA en `analytics-workflow/SKILL.md`): tiene spec propia, corre entre `02_integracion_datos` y `03_limpieza_y_features`, y sus outputs van a `EDA/`. Complementa (no reemplaza) el data audit go/no-go de la Fase 1.
+
 Nombres de archivo y extensiones por lenguaje (`.rds` vs `.parquet`/`.pkl`, `renv` vs `venv`/`uv`) — ver la tabla "Equivalentes en Python" en `analytics-workflow/references/reproducibilidad.md`.
 
 Si el proyecto ya posee una estructura consolidada, respetar nombres y convenciones existentes. Adaptar el flujo sin romper compatibilidad.

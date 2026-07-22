@@ -143,7 +143,7 @@ winsorizar_apply <- function(x, limites) {
 
 # WOE/IV: fit binea (numérico por cuantiles; categórico por categoría) y
 # calcula WOE e IV con suavizado 0.5 en bins sin buenos o sin malos.
-# Missing es un bin propio ("MISSING"). Advierte si IV > 1 (posible leakage).
+# Missing es un bin propio ("MISSING"). Advierte si IV > 0.9 (posible leakage).
 woe_fit <- function(x, target, n_bins = 5) {
   .validar_target(target)
   if (length(x) != length(target)) stop("woe_fit: x y target de largo distinto")
@@ -187,7 +187,7 @@ woe_fit <- function(x, target, n_bins = 5) {
     row.names   = NULL
   )
   iv_total <- sum(tabla$iv)
-  if (iv_total > 1) warning(sprintf("woe_fit: IV = %.3f > 1 — sospechosa de leakage, investigar", iv_total))
+  if (iv_total > 0.9) warning(sprintf("woe_fit: IV = %.3f > 0.9 — sospechosa de leakage, investigar", iv_total))
 
   list(tipo = tipo, cortes = cortes, tabla = tabla, iv_total = iv_total)
 }

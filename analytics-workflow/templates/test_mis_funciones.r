@@ -150,7 +150,7 @@ test_that("woe_fit numérico: fit/apply consistente y MISSING como bin propio", 
   expect_true(!anyNA(res))
 })
 
-test_that("woe_fit advierte IV > 1 como sospecha de leakage", {
+test_that("woe_fit advierte IV > 0.9 como sospecha de leakage", {
   x      <- c(rep("A", 50), rep("B", 50))
   target <- c(rep(0, 49), 1, rep(1, 49), 0)   # separación casi perfecta
   expect_warning(woe_fit(x, target), "leakage")

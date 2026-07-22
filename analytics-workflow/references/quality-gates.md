@@ -68,7 +68,7 @@ Reglas:
 * El target se mide después de la fecha de corte.
 * Features, imputaciones, bins, escaladores y selección de variables se aprenden solo en train.
 * Los parámetros aprendidos en train se congelan y se aplican a test/OOT/producción.
-* Variables con IV > 1 deben reportarse como sospechosas de leakage.
+* Variables con IV > 0.9 deben reportarse como sospechosas de leakage.
 * Performance demasiado alta debe investigarse antes de celebrarse.
 
 Error común:
@@ -92,7 +92,7 @@ Pase de QA con "sombrero de validador" antes de generar el informe final. Es la 
 1. **Reproducción en limpio:** copiar/clonar el repo a un directorio limpio y correr `00_run_pipeline` de punta a punta, sin objetos en memoria ni pasos manuales.
 2. **Verificación de cifras:** cada número del informe se verifica contra los outputs generados.
 3. **Baseline:** el modelo supera al baseline naive / status quo documentado en la spec de modeling.
-4. **Revisión final de leakage:** variables con IV > 1 o performance sospechosamente alta investigadas y resueltas.
+4. **Revisión final de leakage:** variables con IV > 0.9 o performance sospechosamente alta investigadas y resueltas.
 5. **Sensibilidad básica:** métricas estables ante variación razonable (seed, período, subpoblación).
 6. **Consistencia:** mismas cifras en exec summary, cuerpo y anexos; redondeo consistente (ver `informe-ejecutivo.md`).
 7. **Registro:** resultado del QA (fecha, hallazgos, correcciones) documentado; hallazgos relevantes al decision log si afectan lo acordado con el cliente.

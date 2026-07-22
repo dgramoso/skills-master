@@ -5,6 +5,7 @@ description: >
   to capture lessons learned — what went well, what went wrong, key decisions,
   and reusable patterns. Triggered by /lecciones-aprendidas, "lecciones
   aprendidas", "retrospectiva", "qué aprendimos", or "cierre de proyecto".
+  Quick mode: /lecciones-aprendidas rapido.
 ---
 
 # lecciones-aprendidas
@@ -22,6 +23,7 @@ Antes de preguntar, revisá la evidencia disponible de la sesión o proyecto:
 - La conversación actual: qué se intentó, qué falló, qué decisiones se tomaron
 - `git log --oneline` reciente del proyecto, si es un repo
 - Errores, reintentos o cambios de dirección que hayan ocurrido
+- `lecciones-aprendidas/lecciones-aprendidas.md` si ya existe: no repitas lo ya capturado, y si algo que salió mal ya apareció en una retro anterior, marcalo como **recurrente** — esas son las lecciones más valiosas
 
 Con eso, **proponé un borrador en cada sección en vez de preguntar en frío**. Por ejemplo: "De lo que vi en la sesión, salió bien X e Y, y hubo fricción con Z — ¿coincidís? ¿Qué agregarías?". El usuario corrige y completa; no redacta desde cero. Si no hay contexto útil (ej: la retro es sobre un proyecto que no está en esta sesión), preguntá en frío como indica cada sección.
 
@@ -58,14 +60,12 @@ Preguntá:
 ### 7. Guardar
 Una vez completadas las secciones:
 1. Guardá el resultado según "Plantilla y guardado" abajo.
-2. Preguntá: "¿Querés que actualice el CLAUDE.md del proyecto con alguna de estas lecciones?"
+2. Preguntá: "¿Querés que actualice el CLAUDE.md del proyecto con alguna de estas lecciones?" Si acepta, agregá solo reglas accionables de una línea ("hacer X antes de Y") — nunca narrativa ni párrafos de la retro.
 3. Preguntá: "¿Querés que guarde los patrones reutilizables en tu memoria persistente para futuras sesiones?"
 
 ## Calidad de las lecciones
 
 Una lección útil es accionable: qué pasó, por qué, y qué hacer distinto la próxima vez. Si el usuario da una respuesta solo descriptiva ("el deploy fue lento"), repreguntá una vez para llegar a la causa y la acción ("el deploy fue lento porque X; la próxima vez, hacer Y"). No insistas más de una vez — si el usuario no quiere profundizar, guardá lo que dio.
-
-Si el usuario no tiene nada para una sección ("no hubo decisiones clave"), omití esa sección de la entrada — no guardes "N/A" ni secciones vacías.
 
 ## Tono
 - Conversacional, no burocrático

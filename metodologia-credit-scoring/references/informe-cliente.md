@@ -14,7 +14,7 @@ Generar informe HTML ejecutivo con diseño:
 * SF Mono o equivalente para tablas y datos numéricos.
 * Colores neutros, contrastes suaves. Evitar colores brillantes o fondos oscuros.
 
-Gráficos estilo BBC / The Economist: minimalistas, etiquetas claras, sin gridlines innecesarios, foco en storytelling e interpretación. Evitar colores estridentes o decoraciones que distraigan del mensaje. Assertion titles (ver `analytics-workflow/informe-ejecutivo.md`).
+Gráficos estilo BBC / The Economist: minimalistas, etiquetas claras, sin gridlines innecesarios, foco en storytelling e interpretación. Evitar colores estridentes o decoraciones que distraigan del mensaje. Assertion titles (ver `analytics-workflow/references/informe-ejecutivo.md`).
 
 ---
 

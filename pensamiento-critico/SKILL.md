@@ -8,8 +8,8 @@ description: >
   que lo interroguen. Disparadores — "estoy atascado", "no sé qué hacer con",
   "desafiá mi razonamiento", "ayúdame a pensar esto", "algo no está funcionando
   y no sé por qué", "cuestioná mis suposiciones", "pensamiento crítico".
-  NO usar cuando el usuario ya tiene opciones claras a comparar y rankear, ni para
-  preguntas directas que se responden sin taller.
+  NO usar cuando el usuario ya tiene opciones claras a comparar y rankear (derivar
+  a strategic-problem-solving), ni para preguntas directas que se responden sin taller.
 ---
 
 # Pensamiento Crítico — Deconstrucción desde Primeros Principios
@@ -129,6 +129,8 @@ La Fase 4 necesita una decisión candidata. Si el usuario llegó sin ella (el ca
 4. Correr las Fases 4 y 5 sobre esa elección.
 
 Si el usuario ya trae una decisión, saltar este puente y decirlo.
+
+Si la comparación de opciones se vuelve el trabajo central (rankear con criterios, escenarios, scoring), ofrecer derivar al skill `strategic-problem-solving` en vez de estirar este puente.
 
 ---
 

@@ -183,7 +183,7 @@ def woe_fit(x, target, n_bins=5):
     """WOE/IV: binea (numérico por cuantiles; categórico por categoría) sobre TRAIN.
 
     Suavizado 0.5 en bins sin buenos o sin malos. Missing es bin propio
-    ("MISSING"). Advierte si IV > 1 (posible leakage).
+    ("MISSING"). Advierte si IV > 0.9 (posible leakage).
     """
     target = _validar_target(target)
     x = pd.Series(x).reset_index(drop=True)
@@ -217,8 +217,8 @@ def woe_fit(x, target, n_bins=5):
     agg["iv"] = (agg["dist_buenos"] - agg["dist_malos"]) * agg["woe"]
 
     iv_total = float(agg["iv"].sum())
-    if iv_total > 1:
-        warnings.warn(f"woe_fit: IV = {iv_total:.3f} > 1 — sospechosa de leakage, investigar")
+    if iv_total > 0.9:
+        warnings.warn(f"woe_fit: IV = {iv_total:.3f} > 0.9 — sospechosa de leakage, investigar")
 
     return {"tipo": tipo, "cortes": cortes, "tabla": agg, "iv_total": iv_total}
 

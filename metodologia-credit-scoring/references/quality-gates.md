@@ -22,7 +22,7 @@
 
 * Leakage = 0 (ninguna variable con fecha posterior a `periodo_obs`).
 * Missing documentado; variables con missing > 80% se excluyen o se justifica su inclusión.
-* IV de cada variable candidata seleccionada >= `IV_MIN` (default 0.02); IV > 1 se marca como sospechosa de leakage.
+* IV de cada variable candidata seleccionada >= `IV_MIN` (default 0.02); IV > 0.9 se marca como sospechosa de leakage.
 * Variables finales identificadas con `exclusion_log` completo.
 
 ## Gate: Modelización
@@ -39,7 +39,7 @@
 * KS OOT no cae más de 10 puntos respecto a desarrollo.
 * Calibración: PD predicha vs. bad rate observado por banda dentro de tolerancia (ver `modelizacion-y-validacion.md`).
 
-Ejemplo de gate específico (patrón genérico en `analytics-workflow/quality-gates.md`):
+Ejemplo de gate específico (patrón genérico en `analytics-workflow/references/quality-gates.md`):
 
 **R**
 ```r

@@ -66,10 +66,10 @@ Cada umbral de monitoreo tiene acción y responsable definidos, no solo color:
 
 Versionado de modelos y columnas genéricas de `governance/model_registry.csv`: ver `analytics-workflow/references/governance.md`.
 
-Columnas adicionales específicas de credit scoring (extienden las genéricas):
+Columnas adicionales específicas de credit scoring (extienden las genéricas — `target_definition`, `population` y las ventanas ya están en la lista genérica):
 
 ```text
-target_definition | population | observation_window | performance_window | oot_auc | oot_ks | reject_inference_method
+oot_auc | oot_ks | reject_inference_method
 ```
 
 ### Marco regulatorio según uso del modelo

@@ -18,6 +18,8 @@ description: >
 
 ## Routing de referencias
 
+> Las rutas `analytics-workflow/references/...` citadas en esta skill viven en `~/.claude/skills/analytics-workflow/references/` — no en el proyecto del cliente.
+
 | Cuándo lo necesitás | Archivo |
 |---|---|
 | Principios, estructura de carpetas, parámetros de `00_config` específicos de scoring | `references/principios-y-estructura.md` |
@@ -201,6 +203,7 @@ Para cada etapa del pipeline:
 
    Al finalizar el pipeline completo (una sola vez):
    → /code-review ultra   ← revisión profunda multi-agente antes de entregar al cliente
+     (la tipea el usuario: es una revisión cloud facturada que Claude no puede lanzar solo)
 
 6. Commit del script
    → git commit -m "feat: script 0N_nombre — descripción breve"
@@ -353,15 +356,13 @@ Quien valida no puede ser quien desarrolló. Trabajando solo, la versión práct
 
 ## Errores comunes a evitar
 
+Los errores genéricos (código antes de spec, hardcodear parámetros, scripts silenciosos, refactorizar en el medio) están en la tabla "Errores comunes" de `analytics-workflow/SKILL.md`. Acá solo los específicos de crédito:
+
 | Error | Corrección |
 |---|---|
-| Escribir código antes de tener la spec | Siempre spec primero, aunque sea pequeña |
 | Calcular WOE sobre toda la población antes de splitear | Split primero, WOE solo en train |
 | Breaks de bins que generan NAs en test | Usar `-Inf`/`Inf` en extremos de los breaks |
-| Hardcodear parámetros en los scripts | Todo en `00_config` |
-| Scripts que fallan silenciosamente | Quality gates con `stop()`/`raise` explícito |
 | Documentar el "qué" en lugar del "por qué" | CONTEXT.md es para decisiones, no para describir el código |
-| Correr `/improve-codebase-architecture` en el medio del desarrollo | Solo al final |
 
 ---
 
@@ -383,11 +384,8 @@ mkdir -p specs scripts datos/raw datos/processed EDA modelos/v1 \
 #    - crear CLAUDE.md y CONTEXT.md
 #    - crear scripts/00_config.r o 00_config.py
 
-# 5. definir alcance: /to-spec → /grill-with-docs → commit specs/00_proyecto.md
-
-# 6. por cada etapa: /to-spec → /grill-with-docs → código → /code-review → commit
-
-# 7. al finalizar: /code-review ultra → /improve-codebase-architecture → /graphify
+# 5. seguir "Flujo completo por etapa" (arriba): paso 0 una sola vez,
+#    luego pasos 1-7 por cada etapa del pipeline
 ```
 
 ---

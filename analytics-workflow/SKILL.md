@@ -58,7 +58,7 @@ Código que no cumple la spec → código incorrecto.
 
 ## Jerarquía documental
 
-Cinco niveles con roles distintos:
+Seis niveles con roles distintos:
 
 - **PRD** — documento padre de una iniciativa. Define problema, solución, usuarios, user stories, alcance, fuera de alcance, criterios de éxito y specs hijas. Uno por iniciativa importante (`/to-spec`). No reemplaza a las specs. Ej: nuevo motor de scoring, sistema de cobranza inteligente, dashboard ejecutivo de riesgo.
 - **Specs** — documentos operativos: cómo se implementa un componente analítico concreto (target, data snapshot, feature engineering, modeling/validation, deployment, monitoring, report). Cada spec se grilla antes de codear.
@@ -90,14 +90,13 @@ Regla: **CONTEXT.md no es un basurero de decisiones.** Solo contiene conocimient
 nombre_proyecto/
 ├── CLAUDE.md
 ├── CONTEXT.md
-├── METODOLOGIA_<tipo>.md
 │
 ├── docs/
 │   ├── agents/            # issue-tracker.md, triage-labels.md, domain.md
 │   └── adr/               # 0001-decision-template.md
 │
-├── specs/                 # 00_prd_reference.md, 01_…07_…md
-├── scripts/               # 00_config.r, 00_run_pipeline.r, mis_funciones.r, 01_…07_…r
+├── specs/                 # 00_prd_reference.md + specs numeradas según references/specs-por-tipo.md
+├── scripts/               # 00_config.r, 00_run_pipeline.r, mis_funciones.r, 01_…0N_…r
 │
 ├── datos/
 │   ├── raw/               # INMUTABLE
@@ -183,6 +182,7 @@ Tabla de routing. El detalle de uso y los prompts recomendados están en `refere
 |---|---|---|
 | Configurar repo (1 vez) | `/setup-matt-pocock-skills` | Issue tracker, labels, docs de dominio |
 | Crear PRD padre (1 vez/iniciativa) | `/to-spec` | No usar antes de cada script |
+| Estresar el plan tras el PRD | `/premortem` | Asumir que el proyecto falló a los 6 meses; riesgos y mitigaciones a `CONTEXT.md`, los que dependen del cliente se comunican en el kickoff |
 | Crear spec analítica | Prompt manual (ver `references/skills-detalle.md`) | Una por componente crítico |
 | Cuestionar spec | `/grill-with-docs` | Habilita implementación |
 | Crear backlog | `/to-tickets` | Solo con equipo / trazabilidad / agentes |
@@ -191,10 +191,11 @@ Tabla de routing. El detalle de uso y los prompts recomendados están en `refere
 | Implementar | Ponytail full (modo permanente, no es una skill que se invoca) | Mínimo código que pasa quality gates |
 | Funciones reutilizables | `/tdd` | Arrancar de la biblioteca semilla (`templates/mis_funciones.r` / `utils.py`, ya testeada); `/tdd` solo para funciones nuevas |
 | Revisar script | `/code-review` | Después de cada script |
-| Revisar entrega completa | `/code-review ultra` | Una sola vez al final |
+| Revisar entrega completa | `/code-review ultra` | Una sola vez al final; la tipea el usuario (revisión cloud facturada, Claude no puede lanzarla solo) |
 | Refactor final | `/improve-codebase-architecture` | Solo cuando todo funciona |
 | Grafo del codebase | `/graphify` | ≥ 3 scripts o al retomar |
 | Cerrar sesión | `/handoff "próximo objetivo"` | Toda sesión larga cierra con handoff |
+| Cierre de proyecto (handover) | `/lecciones-aprendidas` | Retro del engagement; los patrones reutilizables van a memoria persistente |
 
 ---
 
