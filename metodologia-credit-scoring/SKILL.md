@@ -12,7 +12,24 @@ description: >
 
 **Aplicable a:** proyectos de analítica con Claude Code (credit scoring, modelos predictivos, dashboards)
 
-> **Guía técnica embebida:** `references/credit-scoring.md` contiene la metodología Siddiqi completa (estructura canónica, specs pre-llenadas por etapa, quality gates, WOE/IV, scorecard, strategy tables, fair lending, governance, informe). Este SKILL.md define el **proceso**; la referencia define la **técnica**. Leerla al armar la estructura, al escribir cada spec y al modelizar.
+> **Guía técnica embebida:** la metodología Siddiqi completa (estructura, specs pre-llenadas, quality gates, WOE/IV, scorecard, strategy tables, fair lending, governance, informe) vive en `references/`, dividida por tema — ver la tabla de routing más abajo. Este SKILL.md define el **proceso**; las referencias definen la **técnica**, en R y Python. **Cuando la tarea entre en uno de los casos de la tabla, leé el archivo correspondiente con Read antes de responder** — no trabajes de memoria.
+>
+> Lo genérico (patrón de quality gates, `00_config`, reproducibilidad/`renv`/`venv`, versionado de modelos, informe ejecutivo, Claude API) vive en `analytics-workflow/references/` — esta skill no lo duplica, solo agrega lo específico de credit scoring.
+
+## Routing de referencias
+
+| Cuándo lo necesitás | Archivo |
+|---|---|
+| Principios, estructura de carpetas, parámetros de `00_config` específicos de scoring | `references/principios-y-estructura.md` |
+| Template de spec y specs pre-llenadas (00-05) | `references/specs-template.md` |
+| Umbrales y controles de quality gate específicos de crédito | `references/quality-gates.md` |
+| Ingesta y target, justificación empírica (roll rate/vintage), integración, limpieza/features | `references/pipeline-ingesta-integracion-features.md` |
+| WOE/IV/binning (R vs Python), segmentación de scorecards, reject inference | `references/binning-segmentacion-reject-inference.md` |
+| Champion/challenger, modelización, desbalance, validaciones, calibración, OOT | `references/modelizacion-y-validacion.md` |
+| Scorecard, master scale, strategy tables, swap set, cutoff económico | `references/scorecard-y-strategy-tables.md` |
+| Fair lending, reason codes, PSI, monitoreo, paridad dev-prod, governance, marco regulatorio | `references/fair-lending-y-monitoreo.md` |
+| Funciones compartidas: qué ya existe en `analytics-workflow` vs. qué es específico de crédito | `references/funciones-compartidas.md` |
+| Informe cliente: estilo visual y contenido ejecutivo de scorecard | `references/informe-cliente.md` |
 
 ---
 
@@ -38,7 +55,7 @@ Fase 1 — Data audit (go / no-go)
   GATE: decisión go / no-go / go con alcance reducido, comunicada al cliente
 
 Fase 2 — Desarrollo
-  Pipeline por etapas según references/credit-scoring.md
+  Pipeline por etapas según el routing de references/ (ver tabla arriba)
   GATE: cliente valida definición de target y ventanas ANTES de modelizar
 
 Fase 3 — Validación
@@ -62,7 +79,7 @@ Antes de la spec 01, evaluar formalmente los datos recibidos:
 |---|---|---|
 | Completitud | ¿Llegaron todas las fuentes comprometidas? ¿% de missing en variables clave? | 🟢 🟡 🔴 |
 | Profundidad histórica | ¿Alcanza para ventana de performance + OOT? | 🟢 🟡 🔴 |
-| Volumen de malos | ¿≥ ~2.000 malos? (regla Siddiqi, ver `references/credit-scoring.md`) | 🟢 🟡 🔴 |
+| Volumen de malos | ¿≥ ~2.000 malos? (regla Siddiqi, ver `references/quality-gates.md`) | 🟢 🟡 🔴 |
 | Consistencia | ¿Claves únicas, fechas coherentes, snapshots a la fecha correcta? | 🟢 🟡 🔴 |
 | Linkage | ¿Las fuentes se pueden unir con cobertura aceptable? | 🟢 🟡 🔴 |
 
@@ -74,7 +91,7 @@ Es también la protección contractual del consultor: lo que se entrega depende 
 
 ## Estructura de carpetas (estándar para todo proyecto)
 
-La estructura canónica de carpetas, scripts y specs está definida en `references/credit-scoring.md` (etapas `01_ingesta_y_target` → `05_validacion_y_monitoreo` + `06_informe`). No duplicarla acá: usar siempre esa versión.
+La estructura canónica de carpetas, scripts y specs está definida en `references/principios-y-estructura.md` (etapas `01_ingesta_y_target` → `05_validacion_y_monitoreo` + `06_informe`, en R y Python). No duplicarla acá: usar siempre esa versión.
 
 Esta metodología agrega sobre esa estructura:
 
@@ -84,7 +101,7 @@ nombre_proyecto/
 ├── CONTEXT.md             ← dominio, variables, glosario, decisiones tomadas
 ├── modelos/
 │   └── v1/                ← versionado: cada versión con su CHANGELOG.md
-└── (resto según references/credit-scoring.md)
+└── (resto según references/principios-y-estructura.md)
 ```
 
 **Regla:** `datos/raw/` es inmutable. Nunca sobrescribir datos originales.
@@ -97,7 +114,7 @@ El error más caro en credit scoring no está en el código — está en cómo s
 
 | Decisión | Qué definir | Dónde se documenta |
 |---|---|---|
-| Definición de malo | Días de mora y severidad (ej: mora ≥ 30, ≥ 90, default Basilea) | `CONTEXT.md` + `DEF_DEFAULT` en `00_config.R` |
+| Definición de malo | Días de mora y severidad (ej: mora ≥ 30, ≥ 90, default Basilea) | `CONTEXT.md` + `DEF_DEFAULT` en `00_config` |
 | Ventana de observación | Fecha/período en que se "fotografía" al cliente | `CONTEXT.md` |
 | Ventana de performance | Período posterior en que se observa si cae en mora (típico 12 meses) | `CONTEXT.md` |
 | Población elegible | Quién entra y quién se excluye, con motivo explícito | `CONTEXT.md` + `exclusion_log` |
@@ -128,7 +145,7 @@ El campo **"Decidió"** es el que importa: separa las decisiones metodológicas 
 
 ## Template de spec (usar siempre)
 
-El template de spec y las specs pre-llenadas por etapa (`01_ingesta_y_target` a `05_validacion_y_monitoreo`) están en `references/credit-scoring.md`. No duplicar acá: usar siempre esa versión.
+El template de spec y las specs pre-llenadas por etapa (`01_ingesta_y_target` a `05_validacion_y_monitoreo`) están en `references/specs-template.md`. No duplicar acá: usar siempre esa versión.
 
 ---
 
@@ -197,45 +214,29 @@ Para cada etapa del pipeline:
 
 ---
 
-## `00_config.R` — qué debe contener siempre
+## `00_config` — qué debe contener siempre
 
-El contenido canónico de `00_config.R` (paths, seeds, target, umbrales de calidad, ejemplo completo) está en `references/credit-scoring.md`.
+El contenido genérico de `00_config` (paths, seeds, target, umbrales de calidad) está en `analytics-workflow/references/reproducibilidad.md`, en R y Python. Los parámetros adicionales específicos de credit scoring están en `references/principios-y-estructura.md`.
 
-**Regla:** todo parámetro que puede cambiar entre proyectos vive en `00_config.R`. Los scripts no tienen valores hardcodeados.
+**Regla:** todo parámetro que puede cambiar entre proyectos vive en `00_config`. Los scripts no tienen valores hardcodeados.
 
 ---
 
-## Reproducibilidad: renv + versión de R
+## Reproducibilidad
 
-`set.seed()` garantiza reproducibilidad del muestreo pero no protege contra cambios de API de paquetes.
-
-> **Caso real:** una actualización de `xgboost` renombró parámetros (`eta` → `learning_rate`, `data` → `x`). El mismo código que corría dejó de correr. `set.seed` no evita esto; `renv` sí.
-
-```r
-install.packages("renv")
-renv::init()        # al arrancar el proyecto
-renv::snapshot()    # después de cada cambio en dependencias
-renv::restore()     # al clonar o retomar
-```
-
-**Qué se commitea:** `renv.lock` sí. La carpeta `renv/library/` no (va a `.gitignore`).
-Registrar la versión de R en `CONTEXT.md` (ej: R 4.5.1).
+`renv` (R) / lockfile de `uv`, Poetry o `pip-tools` (Python) — patrón completo, tabla de equivalencias R↔Python y qué se commitea: `analytics-workflow/references/reproducibilidad.md`. No duplicar acá.
 
 ---
 
 ## Interpretaciones automáticas vía Claude API
 
-El script de informe (`06_informe.R`) puede llamar a Claude directamente para generar narrativa analítica con los números reales de cada corrida.
-
-La función `llamar_claude()` (vive en `mis_funciones.R`) y las secciones del informe que genera automáticamente (performance, calibración, PSI, recomendaciones) están definidas en `references/credit-scoring.md`. No duplicar la función acá.
-
-Configuración: agregar `ANTHROPIC_API_KEY=sk-ant-...` en `~/.Renviron`. La función devuelve `""` si no hay API key, sin romper el pipeline.
+El script de informe (`06_informe`) puede llamar a Claude directamente para generar narrativa analítica con los números reales de cada corrida. Función, reglas de uso (privacidad, revisión antes de entregar) y equivalente Python: `analytics-workflow/references/claude-api.md`. Secciones específicas de credit scoring que aplican esa narrativa: `references/funciones-compartidas.md`.
 
 ---
 
 ## Quality Gates
 
-El patrón estándar (`stopifnot()` / `stop()`) y los gates por etapa están definidos en `references/credit-scoring.md`.
+El patrón estándar (`stopifnot()`/`assert`) está en `analytics-workflow/references/quality-gates.md`. Los umbrales y controles específicos de credit scoring (bad rate, IV, VIF, PSI, regla de ~2.000 malos) están en `references/quality-gates.md` de esta skill.
 
 **El script debe fallar ruidosamente.** Un script que termina sin error pero con datos incorrectos es peor que uno que falla.
 
@@ -250,7 +251,7 @@ El patrón estándar (`stopifnot()` / `stop()`) y los gates por etapa están def
 [Una oración describiendo el proyecto. Ver CONTEXT.md para detalle.]
 
 ## Lenguaje
-R. / SQL + R.
+R o Python (definir por proyecto) + SQL.
 
 ## Metodología
 SDD + Ponytail. Cada etapa tiene su spec en specs/. Arrancar siempre por la spec.
@@ -280,13 +281,15 @@ Antes de cerrar, correr `/handoff "descripción de lo que sigue"`.
 ```
 modelos/
   v1/
-    modelo_final.rds
-    scorecard.rds
-    metadata_modelo.rds
+    modelo_final.{rds,pkl}
+    scorecard.{rds,pkl}
+    metadata_modelo.{rds,json}
     CHANGELOG.md
   v2/
     ...
 ```
+
+Ver `analytics-workflow/references/governance.md` para el patrón genérico de versionado.
 
 `CHANGELOG.md` mínimo:
 ```markdown
@@ -300,7 +303,7 @@ modelos/
 
 ## Governance: `model_registry.csv`
 
-Las columnas canónicas de `governance/model_registry.csv` y el ciclo de vida de `status` (`desarrollo` → `validación` → `producción` → `deprecado`) están definidos en `references/credit-scoring.md`.
+Columnas genéricas y ciclo de vida de `status` (`desarrollo` → `validación` → `producción` → `deprecado`): `analytics-workflow/references/governance.md`. Columnas adicionales específicas de crédito: `references/fair-lending-y-monitoreo.md`.
 
 ---
 
@@ -314,7 +317,7 @@ Quien valida no puede ser quien desarrolló. Trabajando solo, la versión práct
    - ¿Hay leakage? ¿La integridad temporal se puede verificar desde los logs?
    - ¿El champion supera al baseline con significancia estadística?
    - ¿Las métricas OOT sostienen las conclusiones del informe?
-   - ¿El pipeline corre desde cero con `renv::restore()`?
+   - ¿El pipeline corre desde cero con `renv::restore()` (R) o el lockfile equivalente (Python)?
 3. Cada hallazgo se resuelve o se acepta por escrito en el decision log — no se ignora.
 
 ---
@@ -323,10 +326,10 @@ Quien valida no puede ser quien desarrolló. Trabajando solo, la versión práct
 
 **Pipeline y calidad:**
 
-- [ ] `00_run_pipeline.R` corre de punta a punta sin intervención manual
+- [ ] `00_run_pipeline` corre de punta a punta sin intervención manual
 - [ ] Todos los quality gates pasan
 - [ ] `/code-review ultra` ejecutado y validación independiente con hallazgos resueltos
-- [ ] Test de paridad dev-prod ejecutado (ver `references/credit-scoring.md`)
+- [ ] Test de paridad dev-prod ejecutado (ver `references/fair-lending-y-monitoreo.md`)
 
 **Documentación y governance:**
 
@@ -355,8 +358,8 @@ Quien valida no puede ser quien desarrolló. Trabajando solo, la versión práct
 | Escribir código antes de tener la spec | Siempre spec primero, aunque sea pequeña |
 | Calcular WOE sobre toda la población antes de splitear | Split primero, WOE solo en train |
 | Breaks de bins que generan NAs en test | Usar `-Inf`/`Inf` en extremos de los breaks |
-| Hardcodear parámetros en los scripts | Todo en `00_config.R` |
-| Scripts que fallan silenciosamente | Quality gates con `stop()` explícito |
+| Hardcodear parámetros en los scripts | Todo en `00_config` |
+| Scripts que fallan silenciosamente | Quality gates con `stop()`/`raise` explícito |
 | Documentar el "qué" en lugar del "por qué" | CONTEXT.md es para decisiones, no para describir el código |
 | Correr `/improve-codebase-architecture` en el medio del desarrollo | Solo al final |
 
@@ -378,7 +381,7 @@ mkdir -p specs scripts datos/raw datos/processed EDA modelos/v1 \
 #    - declarar ponytail activo
 #    - /setup-matt-pocock-skills
 #    - crear CLAUDE.md y CONTEXT.md
-#    - crear scripts/00_config.R
+#    - crear scripts/00_config.r o 00_config.py
 
 # 5. definir alcance: /to-spec → /grill-with-docs → commit specs/00_proyecto.md
 
@@ -393,14 +396,14 @@ mkdir -p specs scripts datos/raw datos/processed EDA modelos/v1 \
 
 | Momento | Skills | Nota |
 |---|---|---|
-| Inicio del proyecto (una vez) | `/setup-matt-pocock-skills` + leer `references/credit-scoring.md` | Configura el repo; la referencia define estructura, specs y gates |
+| Inicio del proyecto (una vez) | `/setup-matt-pocock-skills` + leer `references/principios-y-estructura.md` | Configura el repo; la referencia define estructura, specs y gates |
 | Definición de alcance (una vez) | `/to-spec` → `/grill-with-docs` → `/premortem` | Ver "Flujo completo por etapa", paso 0 |
 | Antes de cada etapa | `/to-spec` → `/grill-with-docs` | Spec borrador, cuestionada antes del código |
-| Al modelizar | `references/credit-scoring.md` + `/advanced-analytics` | La referencia da la técnica Siddiqi; advanced-analytics exige traducción de negocio de cada métrica |
+| Al modelizar | Ver routing de `references/` arriba + `/advanced-analytics` | Las referencias dan la técnica Siddiqi (R y Python); advanced-analytics exige traducción de negocio de cada métrica |
 | Después de cada script | `/code-review` | Obligatorio antes del commit del script |
 | Proyecto con equipo / cliente | `/to-tickets` | Solo si hay equipo o el cliente quiere visibilidad del backlog |
 | Pipeline completo (una vez) | `/code-review ultra` → `/improve-codebase-architecture` → `/graphify` | improve-codebase solo cuando todos los scripts funcionan; graphify útil con ≥ 3 scripts relacionados y al retomar u onboardear |
 | Cerrar sesión / transferir trabajo | `/handoff "próximo objetivo"` | Compacta la sesión en un documento de transferencia |
 | Retomar proyecto pausado | `graphify query "<pregunta>"` | |
-| Funciones reutilizables | `/tdd` | Solo para `mis_funciones.R`; los `stop()` de los scripts ya son TDD implícita |
+| Funciones reutilizables | `/tdd` | Solo para `mis_funciones.r`/`utils.py`; los `stop()`/`raise` de los scripts ya son TDD implícita |
 | Modo de trabajo permanente | `ponytail` (full) | No es skill invocable: se declara al inicio de sesión; marcar simplificaciones con `# ponytail: <razón>` |

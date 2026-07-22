@@ -16,7 +16,7 @@ Esta skill define **cómo se hace y cómo se interpreta un análisis**. No defin
 | Proceso del proyecto: PRD, specs, grill, estados, engagement, entrega, handover | `analytics-workflow` (SKILL.md + `references/`) |
 | Estándar del informe ejecutivo: pyramid principle, piezas del entregable | `analytics-workflow/references/informe-ejecutivo.md` |
 | QA pre-entrega del proyecto completo y quality gates de pipeline | `analytics-workflow/references/quality-gates.md` |
-| Metodología crediticia completa (WOE/IV, scorecard, OOT, strategy tables) | `metodologia-credit-scoring` (+ su `references/credit-scoring.md`) |
+| Metodología crediticia completa (WOE/IV, scorecard, OOT, strategy tables) | `metodologia-credit-scoring` (+ sus `references/`, por tema) |
 | Funciones ya testeadas (PSI, KS, AUC/Gini, lift, WOE/IV fit-apply) | `analytics-workflow/templates/mis_funciones.r` · `utils.py` |
 | Diseño de gráficos y dashboards | skills del plugin data: `data:create-viz` · `data:data-visualization` |
 
