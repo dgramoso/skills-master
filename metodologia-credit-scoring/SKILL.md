@@ -30,7 +30,7 @@ Tres principios que se aplican siempre, en orden de prioridad:
 
 ```
 Fase 0 — Kickoff y alcance
-  /grill-with-docs → /to-spec → /to-tickets
+  /to-spec → /grill-with-docs → /to-tickets → /premortem
   GATE: cliente valida specs/00_proyecto.md (objetivo, target preliminar, datos comprometidos)
 
 Fase 1 — Data audit (go / no-go)
