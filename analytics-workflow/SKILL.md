@@ -30,7 +30,8 @@ Este `SKILL.md` es el núcleo navegable. El detalle operativo vive en archivos a
 | `00_config.r`, `00_run_pipeline.r`, renv | `references/reproducibilidad.md` |
 | Versionado de modelos, CHANGELOG, `model_registry.csv` | `references/governance.md` |
 | Narrativa automática vía Claude API (`llamar_claude()`) | `references/claude-api.md` |
-| Gestión del engagement: intake, decision log, minutas, status, change request, cierre/handover, política de datos | `references/engagement.md` |
+| Gestión del engagement: preventa/propuesta, intake, decision log, minutas, status, change request, cierre/handover, política de datos | `references/engagement.md` |
+| Reportería recurrente: diccionario de KPIs versionado, data contract, QA de cifras, refresh/ownership | `references/reporteria.md` |
 | Estándar de informe ejecutivo: pyramid principle, so-what, visualización, piezas del entregable | `references/informe-ejecutivo.md` |
 | Módulos avanzados **opcionales** (reject inference, validación formal + MDD, fairness, data governance) — activar solo si el cliente/regulador lo exige | `references/modulos-opcionales.md` |
 | Plantillas copiables (config R/Python, CLAUDE.md, CHANGELOG, artefactos de engagement/entrega) | `templates/` |
@@ -127,7 +128,7 @@ Reglas:
 
 ## Workflow por estados
 
-Cada proyecto avanza por estados. No saltar un estado salvo decisión explícita documentada.
+Cada proyecto avanza por estados. No saltar un estado salvo decisión explícita documentada. Antes de `kickoff` puede existir una fase de **preventa** (propuesta aceptada) — ver `references/engagement.md`.
 
 ```text
 kickoff → prd_created → specs_generated → specs_grilled
@@ -187,6 +188,7 @@ Tabla de routing. El detalle de uso y los prompts recomendados están en `refere
 | Cuestionar spec | `/grill-with-docs` | Habilita implementación |
 | Crear backlog | `/to-tickets` | Solo con equipo / trazabilidad / agentes |
 | Metodología credit scoring | `/metodologia-credit-scoring` | Solo proyectos crediticios |
+| Metodología modelos comerciales | `/metodologia-inteligencia-comercial` | Churn, propensión, cross-sell, priorización de cobranza, campañas |
 | Interpretación de negocio | `/advanced-analytics` | Traducir métricas a decisiones |
 | Implementar | Ponytail full (modo permanente, no es una skill que se invoca) | Mínimo código que pasa quality gates |
 | Funciones reutilizables | `/tdd` | Arrancar de la biblioteca semilla (`templates/mis_funciones.r` / `utils.py`, ya testeada); `/tdd` solo para funciones nuevas |

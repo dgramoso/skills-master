@@ -19,6 +19,8 @@ Esta skill define **cómo se hace y cómo se interpreta un análisis**. No defin
 | Metodología crediticia completa (WOE/IV, scorecard, OOT, strategy tables) | `metodologia-credit-scoring` (+ sus `references/`, por tema) |
 | Funciones ya testeadas (PSI, KS, AUC/Gini, lift, WOE/IV fit-apply) | `analytics-workflow/templates/mis_funciones.r` · `utils.py` |
 | Diseño de gráficos y dashboards | skill `dataviz` |
+| Medición de impacto de acciones (test/control, uplift, incrementalidad) | `references/medicion-impacto.md` (de esta skill) — leer ANTES de lanzar la acción, no al analizarla |
+| Metodología de modelos comerciales (churn, propensión, cobranza, NBA) | `metodologia-inteligencia-comercial` |
 
 **Cuándo se invoca esta skill:** análisis exploratorio o modelado dentro de una etapa del pipeline, driver analysis, o cuando hay resultados técnicos que traducir a decisiones de negocio.
 
@@ -92,7 +94,7 @@ Elegir el modelo más simple que responde la pregunta. Por tipo:
 ### 5. Driver analysis
 
 - Métodos según el caso: coeficientes, permutation importance, SHAP, partial dependence, deltas por segmento.
-- **Asociación ≠ causalidad.** Solo afirmar causalidad si el diseño lo soporta (experimento, quasi-experimento, variación exógena); si no, el lenguaje es "asociado a", nunca "causa".
+- **Asociación ≠ causalidad.** Solo afirmar causalidad si el diseño lo soporta (experimento, quasi-experimento, variación exógena); si no, el lenguaje es "asociado a", nunca "causa". Para diseñar y medir el impacto de una acción, leer `references/medicion-impacto.md`.
 - Agrupar drivers en categorías de negocio (perfil, engagement, uso de producto, pricing, operaciones, riesgo, canal) — un ranking de 30 variables técnicas no es un entregable.
 - Cuantificar cada driver en unidades entendibles: puntos de conversión, probabilidad de churn, ingreso esperado, costo evitado.
 

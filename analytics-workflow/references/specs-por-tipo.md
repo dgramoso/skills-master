@@ -200,6 +200,8 @@ Pueden usarse como variables descriptivas posteriores para perfilar clusters.
 
 Ejemplos: dashboard de scoring, tablero de cobranza, reporte de actividad comercial, monitoreo mensual de modelo.
 
+> Si el reporte es **recurrente** (se refresca y se compara período a período), aplicar además `reporteria.md`: diccionario de KPIs versionado, data contract, QA de cifras contra origen y refresh/ownership.
+
 Specs mínimas:
 
 ```text

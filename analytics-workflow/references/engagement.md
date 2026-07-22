@@ -8,12 +8,34 @@ Todos los artefactos de esta sección viven en `engagement/` dentro del repo del
 
 ```text
 engagement/
+├── propuesta.md         # propuesta aceptada (preventa)
 ├── intake.md            # checklist de kickoff completado
 ├── decision_log.md      # aprobaciones del cliente, con fecha
 ├── minutas/             # una por reunión relevante
 ├── status/              # status semanal o por hito
 └── acta_cierre.md       # al terminar
 ```
+
+---
+
+## Preventa / propuesta (antes del kickoff)
+
+La fase de mayor riesgo del engagement ocurre antes de que exista el proyecto: convertir un pedido difuso ("queremos algo con IA para ventas") en un alcance defendible. La propuesta se arma con este contenido (template en `templates/propuesta.md.tmpl`) y, una vez aceptada, se guarda como `engagement/propuesta.md` — es el documento contra el que se miden los change requests.
+
+Contenido mínimo:
+
+* **Problema en palabras del cliente** — una oración citable. Si no se puede escribir, falta una conversación, no una propuesta.
+* **Alcance por fases, con la fase 1 como compuerta**: la fase 1 es siempre diagnóstico con datos reales (data audit / EDA) y su resultado condiciona el resto. Nunca comprometer el modelo, sus métricas ni el cronograma completo antes de haber visto los datos.
+* **Entregables concretos por fase** — qué recibe el cliente, en qué formato, y qué NO incluye (la lista de exclusiones evita más conflictos que la de inclusiones).
+* **Supuestos verificables**: acceso a datos en N días, contraparte técnica asignada, decisor disponible para los gates. Cada supuesto incumplido habilita renegociar plazo o alcance — por escrito en la propuesta, no improvisado en la semana 6.
+* **Esfuerzo/precio por fase**, con la fase 1 cerrada y las siguientes estimadas-a-confirmar tras el diagnóstico.
+* **Condición de éxito del cliente** (qué tiene que pasar para que considere el proyecto exitoso) — se refina en el intake, pero la versión preliminar va acá.
+
+Reglas:
+
+* **No prometer métricas antes del EDA** (misma regla del intake, pero aplicada donde más se viola: en la venta).
+* Antes de enviar una propuesta con monto o compromiso relevante, correr `/premortem` sobre ella — los modos de falla típicos (datos peores de lo prometido, contraparte ausente, alcance elástico) se convierten en supuestos y exclusiones del documento.
+* Lo que el cliente pida por fuera de la propuesta aceptada se maneja como change request (ver abajo), por chiquito que parezca.
 
 ---
 
